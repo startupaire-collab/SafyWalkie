@@ -1,0 +1,4 @@
+{
+  "_mode_emploi": "Ajoutez un objet par lieu partenaire dans la liste. lat et lon : sur openstreetmap.org, clic droit sur le lieu puis « Afficher l'adresse ». Exemple : {\"nom\": \"Café du Capitole\", \"lat\": 43.6045, \"lon\": 1.4440, \"horaires\": \"7h-2h\"}",
+  "partenaires": []
+}

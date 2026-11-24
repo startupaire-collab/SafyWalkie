@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#eb693e">
+<title>AelySafe — V0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<script src="vendor/maplibre-gl.js"></script>
+<style>
+/* VOICE: rassurante, claire, jamais anxiogène ; l'urgence réservée au seul bouton SOS
+   IDEA: une application mobile réelle, comme livrée sur un store — un réseau de loutres qui se tiennent la patte
+   PICTURE: le grand bouton SOS rond + la carte de Toulouse dessinée avec lieux de sûreté
+   COLOUR and TYPE: crème #fff9f2, corail #eb693e dominant, rose #db2777 pour l'alerte, lavande #8e8cf0 en support ; Nunito + Inter
+   LAYOUT: colonne d'app 440px ; au-dessus de 960px un panneau de présentation de la V0 à gauche */
+:root{color-scheme:light dark;
+--bg:light-dark(#fff9f2,#1a1420);--card:light-dark(#ffffff,#251d2c);--ink:light-dark(#2a1d24,#fbefe8);--mute:light-dark(#76646c,#b9a7b0);
+--line:light-dark(#f0e2d8,#3a2e41);--co:#eb693e;--pk:#db2777;--lv:#8e8cf0;--sky:#b7f6ff;--soft:light-dark(#fdeee6,#33232a);--lvs:light-dark(#eeeefe,#2b2944);--ok:light-dark(#16794c,#5fd69a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.n{font-family:Nunito,system-ui,sans-serif;font-weight:900;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:30px}h2{font-size:22px}h3{font-size:17px;font-weight:800}
+p{margin:.4em 0}small,.mute{color:var(--mute);font-size:13.5px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr);min-height:100vh}
+.side{display:none}
+@media(min-width:960px){.wrap{grid-template-columns:minmax(0,1fr) 440px minmax(0,.35fr);gap:40px;padding:0 40px}
+.side{display:block;padding:56px 0;align-self:start;position:sticky;top:0;max-width:520px;justify-self:end}
+.app{border-inline:1px solid var(--line);box-shadow:0 0 60px #eb693e18}}
+.side h1{font-size:44px;margin:18px 0 10px}.side li{margin:6px 0}.side ul{padding-left:20px}
+.app{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;position:relative}
+.top{display:flex;align-items:center;gap:10px;padding:14px 18px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+.top .n{font-size:20px}.top .sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--soft);font-size:13px;font-weight:600;white-space:nowrap}
+.pill.ok{background:light-dark(#e3f6ec,#173326);color:var(--ok)}.pill.lv{background:var(--lvs);color:light-dark(#4b48b8,#c6c5ff)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+main{flex:1;padding:18px 18px 110px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>.g{flex:1}
+.btn{font:700 16px Nunito,sans-serif;min-height:48px;padding:10px 18px;border-radius:14px;border:0;background:var(--co);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:var(--soft);color:var(--ink)}.btn.lv{background:var(--lv)}.btn.pk{background:var(--pk)}.btn.sm{width:auto;min-height:44px;font-size:15px;padding:8px 14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,label:focus-within{outline:3px solid var(--lv);outline-offset:2px}
+label.f{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input[type=text],input[type=date],input[type=password],input[type=tel],select{width:100%;font:16px Inter,sans-serif;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);min-height:48px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 0;font-size:14.5px}.chk input{width:22px;height:22px;flex:none;accent-color:var(--co);margin-top:1px}
+.opt{display:flex;gap:12px;align-items:center;border:2px solid var(--line);border-radius:16px;padding:14px;margin:8px 0;cursor:pointer;background:var(--card)}
+.opt.on{border-color:var(--co);background:var(--soft)}.opt input{accent-color:var(--co);width:20px;height:20px}
+.err{color:var(--pk);font-weight:600;font-size:14px}
+.steps{display:flex;gap:6px;margin:4px 0 18px}.steps i{flex:1;height:5px;border-radius:9px;background:var(--line)}.steps i.on{background:var(--co)}
+nav.tabs{position:fixed;bottom:0;width:100%;max-width:440px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
+@media(min-width:960px){nav.tabs{width:440px}}
+nav.tabs button{background:none;border:0;color:var(--mute);font:600 12px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;cursor:pointer;border-radius:12px}
+nav.tabs button.on{color:var(--co)}nav.tabs svg{width:24px;height:24px}
+.sos{display:grid;place-items:center;margin:8px auto 4px;width:min(250px,70vw);aspect-ratio:1;position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
+.sos button{width:100%;height:100%;border-radius:50%;border:0;cursor:pointer;color:#fff;font:900 46px Nunito,sans-serif;background:radial-gradient(circle at 35% 30%,#ff8a63,var(--co) 45%,var(--pk));box-shadow:0 18px 40px #db277755,inset 0 -10px 30px #0002,inset 0 6px 14px #fff5}
+.sos button span{display:block;font:600 14px Inter,sans-serif;opacity:.92;margin-top:2px}
+.sos svg{position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);pointer-events:none;transform:rotate(-90deg)}
+.halo{position:absolute;inset:0;border-radius:50%;background:var(--pk);opacity:.18;animation:pulse 2.4s infinite}
+@keyframes pulse{0%{transform:scale(.95);opacity:.25}70%{transform:scale(1.18);opacity:0}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.halo,.live{animation:none!important}}
+.alert{background:linear-gradient(160deg,var(--pk),#9d174d);color:#fff;border-radius:24px;padding:20px;margin:8px 0}
+.alert .big{font:900 44px Nunito,sans-serif;white-space:nowrap}
+.live{animation:blink 1.2s infinite}@keyframes blink{50%{opacity:.35}}
+.map{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:light-dark(#f6efe6,#221b28);aspect-ratio:4/5}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}.chips button{flex:none;min-height:40px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;font:600 14px Inter;cursor:pointer}
+.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.li:last-child{border:0}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font:800 15px Nunito,system-ui,sans-serif;color:#fff;background:var(--lv)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-family:Nunito;font-weight:800}
+.code{font:800 22px Nunito;letter-spacing:.06em;white-space:nowrap}
+.note{font-size:13px;color:var(--mute);border-left:3px solid var(--lv);padding-left:10px;margin:10px 0}
+.modal{position:fixed;inset:0;background:#0007;display:grid;place-items:end center;z-index:20;padding:12px}
+.modal .card{width:100%;max-width:420px;margin:0}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:30;max-width:90vw}
+.prev{width:72px;height:72px;border-radius:14px;object-fit:cover;background:var(--soft)}
+.bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--co)}
+.map.ml{aspect-ratio:auto;height:min(62vh,520px);background:var(--soft)}.map.ml.sm{height:300px}
+.mlhost{position:absolute;inset:0}.loading{display:grid;place-items:center;height:100%;color:var(--mute);font-weight:600}
+.maplibregl-popup-content{font:14px/1.4 Inter,sans-serif;border-radius:12px;padding:10px 12px;color:#2a1d24}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--mute);margin:8px 0}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend .ln{width:16px;height:4px;border-radius:2px}
+.sug{display:grid;gap:4px;margin-top:4px}.sug button{text-align:left;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;font:15px Inter,sans-serif;cursor:pointer}
+.inrow{display:flex;gap:8px}.inrow input{flex:1}
+.hero{text-align:center;padding:24px 4px}.hero svg{width:150px;height:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <svg width="64" height="78" viewBox="0 0 100 122" aria-hidden="true"><use href="#otter"/></svg>
+    <h1>AelySafe, version 0</h1>
+    <p>Prototype cliquable de l'application de sécurité personnelle, pensé pour le pilote à Toulouse. Tout fonctionne en simulation dans votre navigateur : aucune donnée ne quitte l'appareil.</p>
+    <ul>
+      <li>Inscription réservée aux majeurs, avec pièce d'identité et selfie en direct</li>
+      <li>Ouvert aux femmes et aux hommes majeurs ; comptes refusés ou bannis pour les auteurs d'agressions</li>
+      <li>Signalement d'un utilisateur, suspension immédiate puis bannissement définitif lié à l'identité</li>
+      <li>Alerte par appui long sur le bouton SOS ou par le bracelet connecté</li>
+      <li>Vraie carte de Toulouse (OpenStreetMap) : lieux de sûreté, métro et tram, zones signalées, itinéraire à pied</li>
+      <li>Mode aidant avec charte d'intervention non violente</li>
+      <li>Signalements anonymes, séparés des données personnelles</li>
+    </ul>
+    <p class="note">Démonstration : inscrivez-vous avec le nom de famille <b>Test-Banni</b> pour voir un compte refusé. Les lieux partenaires affichés sont des exemples, pas de vrais partenaires.</p>
+    <p class="note">En cas de danger réel : 17 (police), 112 (urgences), 114 (par SMS).</p>
+  </aside>
+  <div class="app" id="app"></div>
+  <div></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f08257"/><stop offset="1" stop-color="#db2777"/></linearGradient>
+    <symbol id="otter" viewBox="0 0 100 122">
+      <path d="M50 120C36 98 10 76 10 48a40 40 0 0 1 80 0c0 28-26 50-40 72z" fill="url(#og)"/>
+      <circle cx="24" cy="20" r="9" fill="#b9532f"/><circle cx="76" cy="20" r="9" fill="#b9532f"/>
+      <ellipse cx="50" cy="50" rx="30" ry="27" fill="#fff9f2"/>
+      <ellipse cx="50" cy="62" rx="15" ry="11" fill="#ffe3d4"/>
+      <circle cx="39" cy="46" r="4" fill="#2a1d24"/><circle cx="61" cy="46" r="4" fill="#2a1d24"/>
+      <circle cx="40.3" cy="44.6" r="1.2" fill="#fff"/><circle cx="62.3" cy="44.6" r="1.2" fill="#fff"/>
+      <ellipse cx="50" cy="57" rx="5" ry="3.6" fill="#2a1d24"/>
+      <path d="M44 64q6 5 12 0" stroke="#2a1d24" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M36 62l-10-2M36 66l-10 2M64 62l10-2M64 66l10 2" stroke="#c9a89a" stroke-width="1.4" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+{
+/* ---------- données de référence (exemples V0) ---------- */
+const PLACES=[
+ {id:'p1',n:'Pharmacie du Capitole',t:'pharma',x:178,y:205,h:'8h–20h'},
+ {id:'p2',n:'Café partenaire Esquirol',t:'resto',x:150,y:262,h:'7h–2h'},
+ {id:'p3',n:'Librairie des Carmes',t:'commerce',x:172,y:315,h:'9h–19h'},
+ {id:'p4',n:'Accueil gare Matabiau',t:'transport',x:282,y:118,h:'5h–0h30'},
+ {id:'p5',n:'Bar partenaire Saint-Pierre',t:'resto',x:110,y:218,h:'17h–2h'},
+ {id:'p6',n:'Épicerie de nuit Jean-Jaurès',t:'commerce',x:232,y:196,h:'18h–4h'},
+ {id:'p7',n:'Pharmacie Saint-Cyprien',t:'pharma',x:62,y:300,h:'8h30–21h'},
+ {id:'p8',n:'Point d\'accueil métro Compans',t:'transport',x:140,y:128,h:'5h15–0h'},
+ {id:'p9',n:'Restaurant partenaire François-Verdier',t:'resto',x:262,y:262,h:'11h–1h'}];
+const SPOTS=[{n:'Capitole',x:170,y:222,ll:[1.4440,43.6045],w:2},{n:'Jean-Jaurès',x:222,y:205,ll:[1.4490,43.6058],w:3},{n:'Matabiau',x:270,y:132,ll:[1.4536,43.6110],w:3},{n:'Esquirol',x:160,y:268,ll:[1.4436,43.6002],w:2},{n:'Carmes',x:168,y:330,ll:[1.4456,43.5977],w:1},{n:'Saint-Cyprien',x:78,y:288,ll:[1.4318,43.5980],w:2},{n:'Compans',x:150,y:140,ll:[1.4350,43.6100],w:1},{n:'François-Verdier',x:252,y:248,ll:[1.4532,43.6003],w:1},{n:'Saint-Michel',x:178,y:400,ll:[1.4470,43.5862],w:1}];
+const TYPES={all:'Tous',commerce:'Commerces',pharma:'Pharmacies',resto:'Bars et restos',transport:'Transports'};
+const TCOL={commerce:'#8e8cf0',pharma:'#16a06a',resto:'#eb693e',transport:'#2a7fb8'};
+const REPORT_TYPES=['Harcèlement de rue','Sentiment d\'être suivi·e','Agression verbale','Comportement menaçant','Autre'];
+const CONTEXTS=['Rue','Bus','Métro','Tram','Gare / station','Parking'];
+
+/* ---------- état ---------- */
+const KEY='aelysafe-v0';
+const fresh=()=>({onb:false,step:0,user:{},pin:'',device:null,plan:'free',contacts:[{n:'Maman',p:'06 12 34 56 78'}],codes:[],reports:[],helper:false,tab:'home'});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let T={alert:null,trip:null,filter:'all',sel:null,modal:null,err:'',verif:'idle',idFile:null,selfie:null,incoming:null,going:false};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app=$('#app');
+const toast=m=>{const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)};
+const age=d=>{if(!d)return 0;const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a};
+const genCode=()=>'AELY-'+Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
+const isF=()=>S.user.g==='f';
+
+const ICON={
+ home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+ map:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9" r="2.5" fill="currentColor"/>',
+ help:'<path d="M7 11V7a2 2 0 0 1 4 0v3m0 0V5a2 2 0 0 1 4 0v6m0-3a2 2 0 0 1 4 0v5a8 8 0 0 1-8 8h-1a7 7 0 0 1-6-3.5L3 14a2 2 0 0 1 3.4-2.1L8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+ net:'<circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 8-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+ me:'<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'};
+
+/* ---------- carte ---------- */
+function mapSVG(opts={}){
+  const ps=PLACES.filter(p=>T.filter==='all'||p.t===T.filter);
+  let route='';
+  if(opts.route){const [a,b]=opts.route;const mx=(a.x+b.x)/2+(a.y-b.y)*.15,my=(a.y+b.y)/2+(b.x-a.x)*.15;
+    route=`<path d="M${a.x} ${a.y}Q${mx} ${my} ${b.x} ${b.y}" stroke="#8e8cf0" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="2 10"/>
+    <circle cx="${a.x}" cy="${a.y}" r="7" fill="#8e8cf0"/><circle cx="${b.x}" cy="${b.y}" r="8" fill="#fff" stroke="#8e8cf0" stroke-width="4"/>`}
+  const me=opts.me?`<circle cx="${opts.me.x}" cy="${opts.me.y}" r="22" fill="#db2777" opacity=".18" class="live"/><circle cx="${opts.me.x}" cy="${opts.me.y}" r="9" fill="#db2777" stroke="#fff" stroke-width="3"/>`:'';
+  const helpers=(opts.helpers||[]).map(h=>`<circle cx="${h.x}" cy="${h.y}" r="7" fill="#8e8cf0" stroke="#fff" stroke-width="2.5"/>`).join('');
+  return `<svg viewBox="0 0 360 450" role="img" aria-label="Carte du centre de Toulouse avec les lieux de sûreté">
+  <rect width="360" height="450" fill="light-dark(#f6efe6,#221b28)" style="fill:var(--map-bg,transparent)"/>
+  <g stroke="light-dark(#e7dbcf,#33283a)" style="stroke:var(--line)" stroke-width="2">${Array.from({length:12},(_,i)=>`<line x1="0" y1="${i*40}" x2="360" y2="${i*40+18}"/><line x1="${i*34}" y1="0" x2="${i*34-30}" y2="450"/>`).join('')}</g>
+  <path d="M206 92 L330 70 L350 300 L300 420 L130 440 L106 400 L120 330 L118 250 L124 170 Z" fill="none" stroke="#eb693e" stroke-opacity=".35" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M40 0 C70 80 130 120 112 190 C96 250 92 290 120 340 C140 380 120 420 90 450" stroke="#b7f6ff" stroke-width="30" fill="none" stroke-linecap="round"/>
+  <path d="M40 0 C70 80 130 120 112 190 C96 250 92 290 120 340 C140 380 120 420 90 450" stroke="#7fd6e6" stroke-width="2" fill="none" opacity=".7"/>
+  <path d="M30 330 L78 288 L160 268 L170 222 L222 205 L270 132 L320 60" stroke="#e23b3b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M120 40 L150 140 L222 205 L252 248 L178 400 L200 445" stroke="#f2b705" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  ${SPOTS.map(s=>`<circle cx="${s.x}" cy="${s.y}" r="4" fill="#fff" stroke="#2a1d24" stroke-width="1.5"/><text x="${s.x+7}" y="${s.y-6}" font-size="10.5" font-family="Inter" font-weight="600" fill="currentColor" style="paint-order:stroke;stroke:var(--bg);stroke-width:3px">${s.n}</text>`).join('')}
+  <text x="20" y="440" font-size="11" font-family="Nunito" font-weight="800" fill="#2a8fa3">Garonne</text>
+  ${route}${helpers}
+  ${ps.map(p=>`<g data-act="pick" data-id="${p.id}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="16" fill="transparent"/><path d="M${p.x} ${p.y+2}c-5-6-11-10-11-17a11 11 0 0 1 22 0c0 7-6 11-11 17z" fill="${TCOL[p.t]}" stroke="#fff" stroke-width="2.5" ${T.sel===p.id?'transform="translate(0 -3)"':''}/><path d="M${p.x-4} ${p.y-15}l3 3 6-6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>`).join('')}
+  ${me}
+  </svg>`;
+}
+
+/* ---------- onboarding ---------- */
+function onb(){
+  const st=S.step, total=4;
+  const bar=st>0?`<div class="steps">${Array.from({length:total},(_,i)=>`<i class="${i<st?'on':''}"></i>`).join('')}</div>`:'';
+  const back=st>0?`<button class="btn ghost sm" data-act="back">Retour</button>`:'';
+  let h='';
+  if(st===0)h=`<div class="hero"><svg viewBox="0 0 100 122"><use href="#otter"/></svg>
+    <h1 style="margin-top:14px">AelySafe</h1><p class="mute" style="font-size:16px">Comme les loutres qui se tiennent la patte pour ne pas dériver, on ne vous laisse pas seul·e dehors.</p></div>
+    <div class="card"><div class="li"><div class="ic" style="background:var(--pk)">1</div><div>Un appui sur votre bracelet ou votre montre déclenche l'alerte.</div></div>
+    <div class="li"><div class="ic" style="background:var(--co)">2</div><div>Vos proches et les aidants vérifiés autour de vous reçoivent votre position en temps réel.</div></div>
+    <div class="li"><div class="ic">3</div><div>Les lieux de sûreté partenaires vous accueillent sur votre trajet.</div></div></div>
+    <button class="btn" data-act="next">Créer mon compte</button><p class="mute" style="text-align:center">Pour les femmes et les hommes majeurs. Identité vérifiée pour tout le monde.</p>`;
+  if(st===1)h=`<h2>Qui êtes-vous ?</h2><p class="mute">Ces informations restent privées. Les autres utilisateurs ne voient que votre prénom.</p>
+    <label class="f" for="fn">Prénom</label><input type="text" id="fn" autocomplete="given-name" value="${esc(S.user.fn)}">
+    <label class="f" for="ln">Nom</label><input type="text" id="ln" autocomplete="family-name" value="${esc(S.user.ln)}">
+    <label class="f" for="dob">Date de naissance</label><input type="date" id="dob" value="${esc(S.user.dob)}">
+    <label class="f" for="tel">Téléphone</label><input type="tel" id="tel" autocomplete="tel" value="${esc(S.user.tel)}">
+    <p class="note">Nous ne demandons que le strict nécessaire. Le genre n'est pas demandé : AelySafe est ouvert à toutes et à tous.</p>`;
+  if(st===2)h=`<h2>Vérification d'identité</h2><p class="mute">Obligatoire pour tous, afin d'écarter les faux profils et les personnes malveillantes.</p>
+    <div class="card"><div class="row"><div class="g"><h3>Pièce d'identité</h3><small>Carte d'identité ou passeport, recto</small></div>${T.idFile?'<span class="pill ok"><span class="dot"></span>Ajoutée</span>':''}</div>
+    <label class="btn ghost" style="display:grid;place-items:center;margin-top:10px">Choisir une photo de la pièce<input type="file" accept="image/*" data-file="id" hidden></label></div>
+    <div class="card"><div class="row">${T.selfie?`<img class="prev" src="${T.selfie}" alt="Aperçu du selfie">`:''}<div class="g"><h3>Selfie en direct</h3><small>Prenez-vous en photo maintenant, visage bien éclairé</small></div></div>
+    <label class="btn ghost" style="display:grid;place-items:center;margin-top:10px">Prendre mon selfie<input type="file" accept="image/*" capture="user" data-file="selfie" hidden></label></div>
+    ${T.verif==='run'?'<div class="card"><b>Vérification en cours…</b><div class="bar" style="margin-top:8px"><i class="live" style="width:70%"></i></div></div>':''}
+    ${T.verif==='ok'?`<div class="card"><span class="pill ok"><span class="dot"></span>Identité vérifiée</span>
+    <div class="li"><div class="ic" style="background:var(--ok)">✓</div><div>Document authentique et visage correspondant au selfie</div></div>
+    <div class="li"><div class="ic" style="background:var(--ok)">✓</div><div>Identité absente de la liste des comptes bannis</div></div>
+    <div class="li"><div class="ic" style="background:var(--lv)">?</div><div>Contrôle des antécédents d'agression auprès des autorités<br><small>Piste à valider juridiquement : non active en V0</small></div></div>
+    <p class="mute">Les images sont supprimées après contrôle : seuls le résultat et une empreinte chiffrée du document sont conservés, pour empêcher un compte banni de se réinscrire.</p></div>`:''}
+    <p class="note">V0 : la vérification est simulée. En production, elle sera confiée à un prestataire certifié (contrôle du document et détection du vivant).</p>`;
+  const sec=3;
+  if(st===sec)h=`<h2>Votre sécurité</h2><p class="mute">Ce code à 4 chiffres sert à annuler une alerte. Personne d'autre ne peut l'arrêter à votre place.</p>
+    <label class="f" for="pin">Code d'annulation</label><input type="password" id="pin" inputmode="numeric" maxlength="4" value="${esc(S.pin)}" style="font:800 22px Nunito;letter-spacing:.4em">
+    <div class="card"><label class="chk"><input type="checkbox" id="c1" ${S.user.c1?'checked':''}><span>J'accepte la politique de confidentialité et le traitement de mes données personnelles pour le fonctionnement du service (RGPD).</span></label>
+    <label class="chk"><input type="checkbox" id="c2" ${S.user.c2?'checked':''}><span>J'accepte la charte d'entraide : si j'aide quelqu'un, j'interviens sans violence, je reste visible et j'appelle les secours si nécessaire.</span></label>
+    <label class="chk"><input type="checkbox" id="c3" ${S.user.c3!==false?'checked':''}><span>J'accepte que mes signalements soient conservés de façon anonyme pour améliorer la sécurité des villes. <small>(facultatif, modifiable à tout moment)</small></span></label></div>`;
+  if(st===sec+1)h=`<h2>Votre objet connecté</h2><p class="mute">Il déclenche l'alerte d'un geste, sans sortir votre téléphone.</p>
+    ${[['watch','J\'ai déjà une montre connectée','Apple Watch, Wear OS, Garmin… L\'application est gratuite.'],['band','Je veux le bracelet AelySafe','Bracelet discret avec puce, appui long pour alerter. Prix à définir.'],['key','Je veux le porte-clés AelySafe','Même fonctionnement, à accrocher à son sac. Prix à définir.']].map(([v,t,d])=>`<label class="opt ${S.device===v?'on':''}"><input type="radio" name="dev" value="${v}" ${S.device===v?'checked':''}><span class="g"><b>${t}</b><br><small>${d}</small></span></label>`).join('')}`;
+  const last=st===sec+1;
+  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span><span class="sp"></span>${back}</div>
+  <main>${bar}${h}${T.err?`<p class="err" role="alert">${esc(T.err)}</p>`:''}
+  ${st>0?`<button class="btn" style="margin-top:16px" data-act="${last?'finish':'next'}" ${st===2&&T.verif!=='ok'?'disabled':''}>${last?'Terminer l\'inscription':'Continuer'}</button>`:''}</main>`;
+}
+function validate(){
+  const st=S.step,sec=3;T.err='';
+  if(st===1){Object.assign(S.user,{fn:$('#fn').value.trim(),ln:$('#ln').value.trim(),dob:$('#dob').value,tel:$('#tel').value.trim()});
+    if(!S.user.fn||!S.user.ln||!S.user.dob)return T.err='Merci de remplir prénom, nom et date de naissance.',false;
+    if(age(S.user.dob)<18)return T.err='AelySafe est réservé aux personnes majeures (18 ans et plus).',false}
+  if(st===sec){S.pin=$('#pin').value;S.user.c1=$('#c1').checked;S.user.c2=$('#c2').checked;S.user.c3=$('#c3').checked;
+    if(!/^\d{4}$/.test(S.pin))return T.err='Le code d\'annulation doit contenir 4 chiffres.',false;
+    if(!S.user.c1||!S.user.c2)return T.err='Les deux premières cases sont nécessaires pour utiliser AelySafe.',false}
+  if(st===sec+1){const d=document.querySelector('input[name=dev]:checked');if(!d)return T.err='Choisissez une option.',false;S.device=d.value}
+  return true;
+}
+
+/* ---------- écrans principaux ---------- */
+const devName=()=>({watch:'Montre connectée',band:'Bracelet AelySafe',key:'Porte-clés AelySafe'}[S.device]||'Aucun objet');
+function home(){
+  if(T.alert)return alertView();
+  const trip=T.trip?`<div class="card" style="background:var(--lvs);border-color:transparent"><div class="row"><div class="g"><h3>Trajet en cours</h3><small>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)} · suivi par ${S.contacts.length} proche${S.contacts.length>1?'s':''}</small></div><button class="btn lv sm" data-act="arrived">Je suis arrivé·e</button></div></div>`:'';
+  return `<h1>Bonjour ${esc(S.user.fn)}</h1><p class="mute">Maintenez le bouton 2 secondes pour lancer une alerte.</p>
+  ${trip}
+  <div class="sos" id="sos"><div class="halo"></div><button id="sosb" aria-label="Maintenir pour lancer une alerte">SOS<span>Maintenir</span></button>
+  <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="none" stroke="#2a1d24" stroke-opacity=".08" stroke-width="4"/><circle id="ring" cx="50" cy="50" r="47" fill="none" stroke="#8e8cf0" stroke-width="5" stroke-linecap="round" stroke-dasharray="295.3" stroke-dashoffset="295.3"/></svg></div>
+  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${S.device==='watch'?'W':S.device==='key'?'K':'B'}</div><div class="g"><h3>${devName()}</h3><small>${S.paired?'Connecté · réponse en moins d\'une seconde':'Non appairé'}</small></div>
+  ${S.paired?'<span class="pill ok"><span class="dot"></span>Actif</span>':'<button class="btn sm" data-act="pair">Appairer</button>'}</div>
+  ${S.paired?`<button class="btn ghost" style="margin-top:12px" data-act="press">Simuler un appui long sur ${S.device==='watch'?'la montre':S.device==='key'?'le porte-clés':'le bracelet'}</button>`:''}</div>
+  <div class="row" style="margin-top:4px"><button class="btn ghost g" data-tab="map">Préparer un trajet</button><button class="btn ghost g" data-act="silent">Alerte silencieuse</button></div>
+  <div class="card"><h3>Vos proches de confiance</h3>${S.contacts.map(c=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div></div>`).join('')||'<p class="mute">Aucun proche ajouté.</p>'}
+  <button class="btn ghost sm" data-tab="net">Gérer</button></div>
+  <p class="note">Danger immédiat : appelez le 17 ou le 112. Par SMS : 114. AelySafe complète les secours, il ne les remplace pas.</p>`;
+}
+function alertView(){
+  const a=T.alert,s=Math.floor((Date.now()-a.t0)/1000),mm=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
+  const near=PLACES.map(p=>({...p,d:Math.round(Math.hypot(p.x-a.me.x,p.y-a.me.y)*6)})).sort((x,y)=>x.d-y.d).slice(0,3);
+  return `<div class="alert"><div class="row"><span class="pill" style="background:#fff3;color:#fff"><span class="dot live"></span>${a.silent?'Alerte silencieuse':'Alerte en cours'}</span><span class="sp g"></span><span class="big" id="clock">${mm}:${ss}</span></div>
+  <p style="margin-top:10px">Votre position est partagée en temps réel près de <b>${esc(a.spot)}</b>.</p>
+  <div class="row" style="margin-top:6px"><span class="pill" style="background:#fff2;color:#fff">${S.contacts.length} proche${S.contacts.length>1?'s':''} prévenu${S.contacts.length>1?'s':''}</span><span class="pill" style="background:#fff2;color:#fff">${a.helpers.length} aidants vérifiés à proximité</span></div></div>
+  ${mapOK?`<div class="map ml sm" id="mslot"></div>`:`<div class="map" style="aspect-ratio:4/4">${mapSVG({me:a.me,helpers:a.helpers})}</div>`}
+  <div class="card"><h3>Lieux de sûreté les plus proches</h3>${mapOK?nearReal(a.ll):near.map(p=>`<div class="li"><div class="ic" style="background:${TCOL[p.t]}">✓</div><div class="g">${esc(p.n)}<br><small>Ouvert ${esc(p.h)}</small></div><b style="white-space:nowrap">${p.d} m</b></div>`).join('')}</div>
+  <div class="card"><h3>Je suis en sécurité</h3><label class="f" for="cpin">Code d'annulation</label><input type="password" id="cpin" inputmode="numeric" maxlength="4" style="font:800 22px Nunito;letter-spacing:.4em">
+  ${T.err?`<p class="err">${esc(T.err)}</p>`:''}<button class="btn lv" style="margin-top:10px" data-act="cancel">Arrêter l'alerte</button></div>
+  <p class="note">Appelez le 17 ou le 112 si la situation s'aggrave.</p>`;
+}
+function mapViewSVG(){
+  const sel=PLACES.find(p=>p.id===T.sel);
+  const opts=SPOTS.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join('');
+  return `<h1>Carte et trajets</h1><p class="mute">Centre de Toulouse · lieux de sûreté partenaires</p>
+  <div class="chips">${Object.entries(TYPES).map(([k,v])=>`<button class="${T.filter===k?'on':''}" data-filter="${k}">${v}</button>`).join('')}</div>
+  <div class="map">${mapSVG(T.trip?{route:[T.trip.a,T.trip.b]}:{})}</div>
+  ${sel?`<div class="card"><div class="row"><div class="ic" style="background:${TCOL[sel.t]}">✓</div><div class="g"><h3>${esc(sel.n)}</h3><small>${TYPES[sel.t]} · ouvert ${esc(sel.h)}</small></div></div><p class="mute">Le personnel est formé pour accueillir une personne qui se sent en danger et l'aider à appeler les secours.</p></div>`:'<p class="mute">Touchez un repère pour voir le lieu.</p>'}
+  <div class="card"><h3>${T.trip?'Trajet partagé':'Partager un trajet'}</h3>
+  ${T.trip?`<p>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)}</p><p class="mute">Vos proches voient votre progression. Sans nouvelles 10 minutes après l'heure prévue, ils sont alertés.</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>`:
+  `<label class="f" for="ta">Départ</label><select id="ta">${opts}</select><label class="f" for="tb">Arrivée</label><select id="tb">${opts.replace('value="4"','value="4" selected')}</select>
+  <button class="btn" style="margin-top:12px" data-act="trip">Démarrer et prévenir mes proches</button>`}</div>
+  <p class="mute">Carte simplifiée hors ligne : la vraie carte s'affiche sur la version en ligne (GitHub Pages).</p>`;
+}
+function helpView(){
+  const inc=T.incoming;
+  return `<h1>Aider quelqu'un</h1><p class="mute">Quand une personne déclenche une alerte près de vous, vous pouvez vous rendre visible et l'accompagner vers un lieu sûr.</p>
+  <div class="card"><label class="chk" style="padding:0"><input type="checkbox" id="helper" ${S.helper?'checked':''}><span><b>Je suis disponible pour aider</b><br><small>Vous recevez les alertes dans un rayon de 500 m.</small></span></label></div>
+  ${inc?`<div class="card" style="border:2px solid var(--pk)"><span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte à ${inc.d} m</span>
+   <h2 style="margin-top:10px">${esc(inc.n)} a besoin d'aide</h2><p>Près de <b>${esc(inc.spot)}</b> · ${esc(inc.ctx)}</p>
+   ${T.going?`<h3 style="margin-top:12px">Vous êtes en route</h3><ol style="padding-left:20px"><li>Restez visible et parlez calmement, comme à une connaissance.</li><li>N'intervenez jamais physiquement.</li><li>Appelez le 17 si la situation est dangereuse.</li><li>Proposez d'accompagner la personne vers un lieu de sûreté.</li></ol><button class="btn ghost" data-act="helpdone">La personne est en sécurité</button><button class="btn ghost" style="margin-top:8px" data-act="flag">Signaler un comportement suspect</button>`:
+   `<label class="chk"><input type="checkbox" id="charte"><span>Je m'engage à intervenir sans violence et à respecter la charte d'entraide. Je reste responsable de mes actes.</span></label>
+   <div class="row"><button class="btn g" data-act="go">J'y vais</button><button class="btn ghost g" data-act="decline">Je ne peux pas</button></div>`}</div>`:
+  `<div class="card" style="text-align:center"><svg width="70" height="86" viewBox="0 0 100 122"><use href="#otter"/></svg><p class="mute">Aucune alerte autour de vous.</p>
+   <button class="btn ghost" data-act="simin" ${S.helper?'':'disabled'}>Simuler une alerte à proximité</button></div>`}
+  <div class="card"><h3>La charte d'entraide</h3><p>AelySafe met en relation, il n'organise pas d'intervention. L'aidant agit de sa propre initiative, sans violence, et ne remplace pas les forces de l'ordre.</p></div>`;
+}
+function netView(){
+  return `<h1>Votre réseau</h1>
+  <div class="card"><h3>Proches de confiance</h3><p class="mute">Ils reçoivent vos alertes et suivent vos trajets. Ils doivent installer l'application.</p>
+  ${S.contacts.map((c,i)=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div><button class="btn ghost sm" data-del="${i}">Retirer</button></div>`).join('')}
+  <label class="f" for="cn">Nom</label><input type="text" id="cn"><label class="f" for="cp">Téléphone</label><input type="tel" id="cp">
+  <button class="btn" style="margin-top:12px" data-act="addc">Ajouter ce proche</button></div>
+  <div class="card"><h3>Une communauté protégée</h3>
+  <div class="li"><div class="ic" style="background:var(--co)">1</div><div><b>Identité vérifiée</b><br><small>Pièce d'identité et selfie en direct pour chaque compte, femme ou homme.</small></div></div>
+  <div class="li"><div class="ic" style="background:var(--co)">2</div><div><b>Signalement</b><br><small>Tout comportement inapproprié d'un aidant ou d'un utilisateur peut être signalé après une alerte.</small></div></div>
+  <div class="li"><div class="ic" style="background:var(--pk)">3</div><div><b>Suspension immédiate</b><br><small>Le compte signalé ne reçoit plus d'alertes pendant la vérification par la modération.</small></div></div>
+  <div class="li"><div class="ic" style="background:var(--pk)">4</div><div><b>Bannissement définitif</b><br><small>Lié à la pièce d'identité : impossible de revenir avec un nouveau compte.</small></div></div>
+  <p class="note">Piste à valider : un partenariat avec la police pour exclure dès l'inscription les auteurs d'agressions. Ces fichiers ne sont aujourd'hui consultables que par des organismes autorisés par la loi.</p></div>`;
+}
+function meView(){
+  const r=S.reports;const by=CONTEXTS.map(c=>({c,n:r.filter(x=>x.ctx===c).length})).filter(x=>x.n);const mx=Math.max(1,...by.map(x=>x.n));
+  return `<h1>Compte</h1>
+  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${esc(S.user.fn[0]||'?')}</div><div class="g"><h3>${esc(S.user.fn)} ${esc(S.user.ln)}</h3><small>${age(S.user.dob)} ans · membre vérifié</small></div><span class="pill ok"><span class="dot"></span>Vérifié</span></div></div>
+  <div class="card"><h3>Offre</h3><table><tr><th>Formule</th><th>Contenu</th></tr>
+  <tr><td>Gratuite</td><td>Application, alertes, carte, trajets, réseau. Avec une montre connectée déjà possédée.</td></tr>
+  <tr><td>Objet AelySafe</td><td>Bracelet ou porte-clés à acheter (prix à définir), pour ceux qui n'ont pas de montre.</td></tr></table>
+  <p style="margin-top:8px">Votre équipement : <b>${devName()}</b></p></div>
+  <div class="card"><h3>Données personnelles et données de signalement</h3>
+  <table><tr><th>Données personnelles</th><th>Données de signalement</th></tr>
+  <tr><td>Nom, téléphone, date de naissance, statut de vérification, proches</td><td>Type d'incident, zone d'environ 500 m, tranche horaire, contexte (rue, bus, métro)</td></tr>
+  <tr><td>Servent uniquement au fonctionnement du service</td><td>Anonymes : aucun lien possible avec vous</td></tr>
+  <tr><td>Jamais vendues ni partagées</td><td>Agrégées et cédées aux collectivités pour la ville intelligente</td></tr>
+  <tr><td>Supprimables à tout moment</td><td>Conservées seulement si vous avez accepté</td></tr></table>
+  <label class="chk"><input type="checkbox" id="c3b" ${S.user.c3?'checked':''}><span>Partager mes signalements de façon anonyme</span></label></div>
+  <div class="card"><h3>Mes signalements anonymes</h3>${r.length?by.map(x=>`<div style="margin:8px 0"><div class="row"><span class="g">${x.c}</span><b>${x.n}</b></div><div class="bar"><i style="width:${x.n/mx*100}%"></i></div></div>`).join('')+
+   `<table style="margin-top:8px"><tr><th>Ce qui est transmis</th></tr>${r.slice(-3).reverse().map(x=>`<tr><td>${esc(x.type)} · ${esc(x.ctx)} · zone ${esc(x.zone)} · ${esc(x.slot)}</td></tr>`).join('')}</table>`:'<p class="mute">Aucun signalement pour l\'instant.</p>'}</div>
+  <button class="btn ghost" data-act="reset">Supprimer mon compte et mes données</button>
+  <p class="mute" style="text-align:center;margin-top:14px">AelySafe V0 · prototype · startupaire@gmail.com</p>`;
+}
+
+function banned(){
+  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span></div>
+  <main><div class="card" style="border:2px solid var(--pk);margin-top:24px"><h2>Inscription refusée</h2>
+  <p>Cette identité est liée à un compte banni de la communauté AelySafe, à la suite de signalements confirmés.</p>
+  <p class="mute">Le bannissement est définitif et lié à la pièce d'identité : créer un nouveau compte avec le même document est impossible. Une contestation est possible auprès de l'équipe de modération (startupaire@gmail.com).</p></div>
+  <p class="note">Démonstration du refus d'inscription.</p><button class="btn ghost" data-act="doreset">Revenir au début</button></main>`;
+}
+function render(){
+  if(S.banned)return banned();
+  if(!S.onb)return onb();
+  const views={home,map:mapView,help:helpView,net:netView,me:meView};
+  const tabs=[['home','Accueil'],['map','Carte'],['help','Aider'],['net','Réseau'],['me','Compte']];
+  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span><span class="sp"></span>
+  ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.paired?`<span class="pill ok"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'}</span>`:'<span class="pill">Non appairé</span>'}</div>
+  <main>${views[S.tab]()}</main>
+  <nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}</nav>
+  ${T.modal||''}`;
+  if(S.tab==='home'&&!T.alert)bindSOS();
+  afterRender();
+}
+
+/* ---------- alerte ---------- */
+let tick=null;
+function startAlert(silent){
+  const sp=SPOTS[Math.floor(Math.random()*SPOTS.length)];
+  T.alert={t0:Date.now(),silent,spot:sp.n,me:{x:sp.x,y:sp.y},ll:sp.ll,helpers:[0,1,2,3].map(()=>({x:sp.x+(Math.random()-.5)*110,y:sp.y+(Math.random()-.5)*110})),hll:[0,1,2,3].map(()=>[sp.ll[0]+(Math.random()-.5)*.006,sp.ll[1]+(Math.random()-.5)*.004])};
+  if(navigator.geolocation)try{navigator.geolocation.getCurrentPosition(p=>{const ll=[p.coords.longitude,p.coords.latitude];if(T.alert&&inArea(ll)){T.alert.ll=ll;T.alert.spot='votre position';T.alert.hll=T.alert.hll.map(()=>[ll[0]+(Math.random()-.5)*.006,ll[1]+(Math.random()-.5)*.004]);T.flown=0;render()}},()=>{},{enableHighAccuracy:true,timeout:6000})}catch(e){}
+  S.tab='home';T.err='';render();
+  if(!silent&&navigator.vibrate)try{navigator.vibrate([200,100,200])}catch(e){}
+  clearInterval(tick);tick=setInterval(()=>{const c=$('#clock');if(!c||!T.alert)return;const s=Math.floor((Date.now()-T.alert.t0)/1000);c.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},1000);
+}
+function bindSOS(){
+  const b=$('#sosb'),ring=$('#ring');let raf,t0;
+  const stop=()=>{cancelAnimationFrame(raf);ring.style.strokeDashoffset=295.3};
+  const loop=()=>{const p=Math.min(1,(performance.now()-t0)/2000);ring.style.strokeDashoffset=295.3*(1-p);if(p>=1){stop();startAlert(false)}else raf=requestAnimationFrame(loop)};
+  b.addEventListener('pointerdown',e=>{e.preventDefault();t0=performance.now();loop()});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,stop));
+  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!e.repeat){t0=performance.now();loop()}}});
+  b.addEventListener('keyup',stop);
+}
+function reportModal(){
+  T.modal=`<div class="modal"><div class="card"><h2>Alerte terminée</h2><p class="mute">Voulez-vous signaler ce qui s'est passé ? Le signalement est anonyme : ni votre nom ni votre position exacte ne sont transmis.</p>
+  <label class="f" for="rt">Type</label><select id="rt">${REPORT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
+  <label class="f" for="rc">Où étiez-vous ?</label><select id="rc">${CONTEXTS.map(t=>`<option>${t}</option>`).join('')}</select>
+  <label class="chk"><input type="checkbox" id="ru"><span>Un aidant ou un utilisateur AelySafe a eu un comportement inapproprié. <small>Ce signalement-là n'est pas anonyme : il est transmis à la modération.</small></span></label>
+  <div class="row" style="margin-top:14px"><button class="btn g" data-act="sendrep">Envoyer anonymement</button><button class="btn ghost g" data-act="skiprep">Passer</button></div></div></div>`;
+}
+
+/* ---------- événements ---------- */
+app.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.name==='g'){S.user.g=t.value;app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.contains(document.querySelector('input[name=g]:checked'))))}
+  if(t.name==='dev')app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.querySelector('input').checked));
+  if(t.dataset.file){const f=t.files&&t.files[0];if(!f)return;
+    if(t.dataset.file==='id')T.idFile=f.name;else{try{T.selfie=URL.createObjectURL(f)}catch(err){T.selfie=null}}
+    if(T.idFile&&T.selfie&&T.verif==='idle'){T.verif='run';setTimeout(()=>{T.verif='ok';S.user.verified=true;save();if(!S.onb&&S.step===2)render()},1800)}
+    render()}
+  if(t.id==='helper'){S.helper=t.checked;if(!S.helper)T.incoming=null;save();render()}
+  if(t.id==='c3b'){S.user.c3=t.checked;save();toast(t.checked?'Partage anonyme activé':'Partage anonyme désactivé')}
+});
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act],[data-tab],[data-filter],[data-mf],[data-del],[data-copy]');if(!el||el.disabled)return;
+  if(el.dataset.tab){S.tab=el.dataset.tab;T.err='';save();render();window.scrollTo(0,0);return}
+  if(el.dataset.filter){T.filter=el.dataset.filter;render();return}
+  if(el.dataset.mf){T.mf=el.dataset.mf;render();return}
+  if(el.dataset.del){S.contacts.splice(+el.dataset.del,1);save();render();return}
+  if(el.dataset.copy){navigator.clipboard?.writeText(el.dataset.copy).then(()=>toast('Code copié'),()=>toast('Copie impossible, notez le code'));return}
+  const a=el.dataset.act;
+  if(a==='next'){if(S.step===0||validate()){if(S.step===2&&/^test-banni$/i.test(S.user.ln||'')){S.banned=true;save();render();return}S.step++;T.err=''}save();render();window.scrollTo(0,0)}
+  if(a==='back'){S.step=Math.max(0,S.step-1);T.err='';render()}
+  if(a==='finish'){if(validate()){S.onb=true;S.tab='home';save();toast('Bienvenue dans le réseau AelySafe')}render()}
+  if(a==='pair'){toast('Recherche de l\'objet…');setTimeout(()=>{S.paired=true;save();render();toast(devName()+' connecté')},1200)}
+  if(a==='press')startAlert(false);
+  if(a==='silent')startAlert(true);
+  if(a==='cancel'){const v=$('#cpin').value;if(v!==S.pin){T.err='Code incorrect. L\'alerte continue.';render();return}
+    clearInterval(tick);T.alert=null;T.err='';reportModal();render()}
+  if(a==='sendrep'){const h=new Date().getHours(),sl=String(Math.floor(h/3)*3).padStart(2,'0');
+    S.reports.push({type:$('#rt').value,ctx:$('#rc').value,zone:'TLS-'+(Math.floor(Math.random()*40)+100),slot:`${sl}h–${String((+sl+3)%24).padStart(2,'0')}h`});
+    const ru=$('#ru').checked;T.modal=null;save();render();toast(ru?'Merci. Le compte concerné est suspendu le temps de la vérification.':'Signalement anonyme envoyé. Merci.')}
+  if(a==='skiprep'){T.modal=null;render()}
+  if(a==='pick'){T.sel=el.dataset.id;render()}
+  if(a==='trip'){const A=SPOTS[$('#ta').value],B=SPOTS[$('#tb').value];if(A===B){toast('Choisissez deux lieux différents');return}T.trip={a:A,b:B};render();toast('Trajet partagé avec vos proches')}
+  if(mapAct(a,el))return;
+  if(a==='arrived'){T.trip=null;render();toast('Bien arrivé·e ! Vos proches sont prévenus.')}
+  if(a==='simin'){const sp=SPOTS[Math.floor(Math.random()*SPOTS.length)];T.incoming={n:['Léa','Inès','Thomas','Camille','Yanis'][Math.floor(Math.random()*5)],spot:sp.n,d:150+Math.floor(Math.random()*300),ctx:CONTEXTS[Math.floor(Math.random()*CONTEXTS.length)]};T.going=false;render()}
+  if(a==='go'){if(!$('#charte').checked){toast('Acceptez la charte pour continuer');return}T.going=true;render()}
+  if(a==='decline'){T.incoming=null;render();toast('D\'autres aidants ont été prévenus')}
+  if(a==='flag'){T.incoming=null;T.going=false;render();toast('Signalement transmis à la modération');return}
+  if(a==='helpdone'){T.incoming=null;T.going=false;render();toast('Merci pour votre aide')}
+  if(a==='addc'){const n=$('#cn').value.trim(),p=$('#cp').value.trim();if(!n||!p){toast('Nom et téléphone requis');return}S.contacts.push({n,p});save();render()}
+  if(a==='reset'){T.modal=`<div class="modal"><div class="card"><h2>Tout supprimer ?</h2><p class="mute">Votre compte, vos proches et vos codes seront effacés de cet appareil. Une empreinte chiffrée de votre pièce est gardée seulement en cas de bannissement. Les signalements déjà transmis restent anonymes et ne peuvent pas être reliés à vous.</p><div class="row" style="margin-top:12px"><button class="btn pk g" data-act="doreset">Supprimer</button><button class="btn ghost g" data-act="skiprep">Annuler</button></div></div></div>`;render()}
+  if(a==='doreset'){S=fresh();T={...T,modal:null,alert:null,trip:null,verif:'idle',idFile:null,selfie:null,incoming:null};save();render()}
+});
+
+/* ---------- vraie carte : MapLibre + OpenStreetMap (100 % gratuit, sans clé) ---------- */
+const GEO={center:[1.4442,43.6035],bbox:[1.38,43.56,1.50,43.66],max:[[1.25,43.50],[1.62,43.72]]};
+const SRC={style:'https://tiles.openfreemap.org/styles/liberty',overpass:'https://overpass-api.de/api/interpreter',route:'https://routing.openstreetmap.de/routed-foot/route/v1/driving/',geo:'https://photon.komoot.io/api/'};
+const KIND={partner:['Partenaire AelySafe','#db2777'],pharmacy:['Pharmacie','#16a06a'],police:['Police','#2a5bd7'],hospital:['Hôpital, clinique','#e23b3b'],station:['Gare, station','#2a8fa3']};
+const MF={all:'Tous',partner:'Partenaires',pharmacy:'Pharmacies',police:'Police',hospital:'Santé',station:'Transports'};
+/* Couleurs de la carte : modifiez ici pour personnaliser le style */
+const PAL={day:{bg:'#fff9f2',water:'#b7f6ff',green:'#e5f1dc',bld:'#f3e5d9',road:'#ffffff',casing:'#eedccf',major:'#ffd8c4',rail:'#d9c9d6',text:'#5b4650',halo:'#fff9f2'},
+ night:{bg:'#1a1420',water:'#1d3a55',green:'#1c2721',bld:'#2b2231',road:'#3b3042',casing:'#241b2a',major:'#6e4048',rail:'#4a3d52',text:'#d9c9d1',halo:'#1a1420'}};
+let M=null,mapOK=null,mapP=null,host=null,FONT=['Noto Sans Bold'],MD={places:[],lines:[],partners:[]},isNight=false,LAY={lines:true,heat:false};
+T.mf='all';T.form={from:'',to:''};T.pickd={};T.sugs={};T.plan=null;T.flown=0;
+const fc=f=>({type:'FeatureCollection',features:f});
+const pt=(ll,p)=>({type:'Feature',geometry:{type:'Point',coordinates:ll},properties:p});
+const hav=(a,b)=>{const r=Math.PI/180,x=Math.sin((b[1]-a[1])*r/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin((b[0]-a[0])*r/2)**2;return 12742000*Math.asin(Math.sqrt(x))};
+const inArea=ll=>ll[0]>GEO.max[0][0]&&ll[0]<GEO.max[1][0]&&ll[1]>GEO.max[0][1]&&ll[1]<GEO.max[1][1];
+const okCol=c=>/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c||'')?c:'#8e8cf0';
+function get(url,opt={},ms=9000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);return fetch(url,{...opt,signal:c.signal}).finally(()=>clearTimeout(t))}
+function initMap(){return mapP||(mapP=boot().then(ok=>{mapOK=ok;return ok}))}
+async function boot(){
+  if(!window.maplibregl)return false;
+  let style;try{const r=await get(SRC.style,{},7000);if(!r.ok)return false;style=await r.json()}catch(e){return false}
+  const f=(style.layers||[]).map(l=>l.layout&&l.layout['text-font']).find(v=>Array.isArray(v)&&v.every(x=>typeof x==='string'));if(f)FONT=[f.find(x=>/Bold/.test(x))||f[0]];
+  host=document.createElement('div');host.className='mlhost';(document.getElementById('mslot')||document.body).appendChild(host);
+  try{M=new maplibregl.Map({container:host,style,center:GEO.center,zoom:13.6,minZoom:11,maxBounds:GEO.max,attributionControl:{compact:true}})}catch(e){host.remove();return false}
+  M.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  const ok=await Promise.race([new Promise(r=>M.once('load',()=>r(true))),new Promise(r=>setTimeout(()=>r(false),12000))]);
+  if(!ok){M.remove();host.remove();M=null;return false}
+  const h=new Date().getHours();theme(h>=20||h<7);layers();loadOSM();loadPartners();return true;
+}
+function theme(night){
+  isNight=night;const p=PAL[night?'night':'day'];
+  for(const l of M.getStyle().layers){if(l.id.startsWith('ae-'))continue;const sl=l['source-layer']||'',id=l.id;
+    try{
+      if(l.type==='background')M.setPaintProperty(id,'background-color',p.bg);
+      else if(l.type==='fill'){if(sl==='water')M.setPaintProperty(id,'fill-color',p.water);else if(sl==='building')M.setPaintProperty(id,'fill-color',p.bld);else if(sl==='park'||/park|wood|grass|forest|scrub|meadow|garden/.test(id))M.setPaintProperty(id,'fill-color',p.green);else if(/landuse|landcover/.test(sl))M.setPaintProperty(id,'fill-color',p.bg)}
+      else if(l.type==='fill-extrusion')M.setPaintProperty(id,'fill-extrusion-color',p.bld);
+      else if(l.type==='line'){if(sl==='waterway')M.setPaintProperty(id,'line-color',p.water);else if(sl==='transportation'){M.setPaintProperty(id,'line-color',/casing/.test(id)?p.casing:/rail|transit/.test(id)?p.rail:/motorway|trunk|primary/.test(id)?p.major:p.road)}else if(sl==='boundary')M.setLayoutProperty(id,'visibility','none')}
+      else if(l.type==='symbol'){if(sl==='poi')M.setLayoutProperty(id,'visibility','none');else{M.setPaintProperty(id,'text-color',p.text);M.setPaintProperty(id,'text-halo-color',p.halo)}}
+    }catch(e){}}
+  if(M.getLayer('ae-lines-case'))M.setPaintProperty('ae-lines-case','line-color',p.bg);
+}
+function heatData(){let z=11;const rnd=()=>(z=z*16807%2147483647)/2147483647,f=[];
+  for(const sp of SPOTS)for(let i=0;i<40*sp.w;i++){const a=rnd()*6.283,r=Math.sqrt(rnd())*.0045;f.push(pt([sp.ll[0]+Math.cos(a)*r*1.4,sp.ll[1]+Math.sin(a)*r],{}))}
+  return fc(f)}
+function layers(){
+  const src=(id,d)=>M.addSource(id,{type:'geojson',data:d||fc([])});
+  src('ae-lines');src('ae-places');src('ae-heat',heatData());src('ae-route');src('ae-me');src('ae-helpers');
+  const cap={'line-cap':'round','line-join':'round'};
+  M.addLayer({id:'ae-heat',type:'heatmap',source:'ae-heat',layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],11,12,16,42],'heatmap-intensity':.9,'heatmap-opacity':.75,'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(142,140,240,0)',.25,'#8e8cf0',.55,'#eb693e',.85,'#db2777']}});
+  M.addLayer({id:'ae-lines-case',type:'line',source:'ae-lines',layout:cap,paint:{'line-color':PAL.day.bg,'line-width':7,'line-opacity':.9}});
+  M.addLayer({id:'ae-lines',type:'line',source:'ae-lines',layout:cap,paint:{'line-color':['get','c'],'line-width':3.5}});
+  M.addLayer({id:'ae-lines-lbl',type:'symbol',source:'ae-lines',layout:{'symbol-placement':'line','text-field':['get','ref'],'text-size':12,'symbol-spacing':300,'text-font':FONT},paint:{'text-color':['get','c'],'text-halo-color':'#fff','text-halo-width':2}});
+  M.addLayer({id:'ae-route-case',type:'line',source:'ae-route',layout:cap,paint:{'line-color':'#fff','line-width':10}});
+  M.addLayer({id:'ae-route',type:'line',source:'ae-route',layout:cap,paint:{'line-color':'#8e8cf0','line-width':6}});
+  M.addLayer({id:'ae-places',type:'circle',source:'ae-places',paint:{'circle-color':['get','c'],'circle-stroke-color':'#fff','circle-stroke-width':2,
+    'circle-radius':['interpolate',['linear'],['zoom'],12,['case',['==',['get','k'],'partner'],7,4],16,['case',['==',['get','k'],'partner'],12,9]]}});
+  M.addLayer({id:'ae-helpers',type:'circle',source:'ae-helpers',paint:{'circle-color':'#8e8cf0','circle-radius':8,'circle-stroke-color':'#fff','circle-stroke-width':3}});
+  M.addLayer({id:'ae-me-halo',type:'circle',source:'ae-me',paint:{'circle-color':'#db2777','circle-opacity':.18,'circle-radius':30}});
+  M.addLayer({id:'ae-me',type:'circle',source:'ae-me',paint:{'circle-color':'#db2777','circle-radius':10,'circle-stroke-color':'#fff','circle-stroke-width':3}});
+  M.on('click','ae-places',e=>{const f=e.features[0],p=f.properties,d=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('div');
+    b.textContent=p.n;sm.textContent=(KIND[p.k]||['Lieu'])[0]+(p.h?' · '+p.h:'');sm.style.color='#76646c';d.append(b,sm);
+    new maplibregl.Popup({closeButton:false,offset:12}).setLngLat(f.geometry.coordinates).setDOMContent(d).addTo(M)});
+  M.on('mouseenter','ae-places',()=>M.getCanvas().style.cursor='pointer');M.on('mouseleave','ae-places',()=>M.getCanvas().style.cursor='');
+}
+async function loadOSM(){
+  let j=null;try{const c=JSON.parse(localStorage.getItem('aely-osm')||'null');if(c&&Date.now()-c.t<864e5)j=c.j}catch(e){}
+  if(!j){const b=GEO.bbox,bb=`${b[1]},${b[0]},${b[3]},${b[2]}`;
+    const q=`[out:json][timeout:25];(nwr["amenity"~"^(pharmacy|police|hospital|clinic)$"](${bb});node["railway"="station"](${bb}););out center tags;relation["route"~"^(subway|tram)$"](${bb});out geom tags;`;
+    try{const r=await get(SRC.overpass,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}},30000);if(!r.ok)throw 0;j=await r.json();try{localStorage.setItem('aely-osm',JSON.stringify({t:Date.now(),j}))}catch(e){}}
+    catch(e){toast('Lieux OpenStreetMap indisponibles, réessayez plus tard');return}}
+  const places=[],lines=[];
+  for(const e of j.elements||[]){const t=e.tags||{};
+    if(e.type==='relation'){const c=okCol(t.colour||t.color);for(const m of e.members||[])if(m.type==='way'&&Array.isArray(m.geometry)&&!/platform|stop/.test(m.role||''))lines.push({type:'Feature',geometry:{type:'LineString',coordinates:m.geometry.map(g=>[g.lon,g.lat])},properties:{c,ref:String(t.ref||''),n:String(t.name||'')}});continue}
+    const lat=e.lat??e.center?.lat,lon=e.lon??e.center?.lon;if(lat==null)continue;
+    const k=t.amenity==='clinic'?'hospital':t.amenity||(t.railway==='station'?'station':'');if(!KIND[k]||k==='partner')continue;
+    places.push(pt([lon,lat],{k,c:KIND[k][1],n:String(t.name||KIND[k][0]),h:String(t.opening_hours||'')}))}
+  MD.places=places;MD.lines=lines;if(!M)return;M.getSource('ae-lines').setData(fc(lines));refreshPlaces();legend();
+}
+async function loadPartners(){try{const r=await fetch('partenaires.json',{cache:'no-cache'});if(!r.ok)return;const a=await r.json();
+  MD.partners=(Array.isArray(a)?a:a.partenaires||[]).filter(p=>isFinite(+p.lat)&&isFinite(+p.lon)&&p.lat!==''&&p.lon!=='').map(p=>pt([+p.lon,+p.lat],{k:'partner',c:KIND.partner[1],n:String(p.nom||'Partenaire'),h:String(p.horaires||'')}));refreshPlaces();legend()}catch(e){}}
+function refreshPlaces(){if(!M)return;M.getSource('ae-places').setData(fc([...MD.partners,...MD.places]));M.setFilter('ae-places',T.mf==='all'?null:['==',['get','k'],T.mf])}
+function legend(){const el=document.getElementById('mlegend');if(!el)return;
+  const ln=[...new Map(MD.lines.filter(l=>l.properties.ref).map(l=>[l.properties.ref,l.properties.c])).entries()].sort();
+  el.innerHTML=Object.entries(KIND).map(([k,[n,c]])=>`<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')+(LAY.lines?ln.map(([r,c])=>`<span><i class="ln" style="background:${esc(okCol(c))}"></i>${esc(r)}</span>`).join(''):'')
+   +(LAY.heat?'<span><i style="background:#db2777"></i>Zones signalées (données simulées)</span>':'')
+   +(MD.partners.length?'':'<span>Aucun partenaire pour l\'instant</span>');}
+function nearReal(ll){const all=[...MD.partners,...MD.places].filter(f=>f.properties.k!=='station');
+  if(!all.length)return '<p class="mute">Chargement des lieux…</p>';
+  return all.map(f=>({p:f.properties,d:Math.round(hav(ll,f.geometry.coordinates))})).sort((a,b)=>a.d-b.d).slice(0,3)
+   .map(({p,d})=>`<div class="li"><div class="ic" style="background:${p.c}">✓</div><div class="g">${esc(p.n)}<br><small>${esc(KIND[p.k][0])}${p.h?' · '+esc(p.h):''}</small></div><b style="white-space:nowrap">${d} m</b></div>`).join('')}
+function setRoute(geo){if(M)M.getSource('ae-route').setData(geo?fc([{type:'Feature',geometry:geo,properties:{}}]):fc([]))}
+function afterRender(){
+  const slot=document.getElementById('mslot');if(!slot)return;
+  if(mapOK===null){initMap().then(()=>{if(document.getElementById('mslot')||S.tab==='map'||T.alert)render()});return}
+  if(!mapOK||!host)return;
+  slot.appendChild(host);M.resize();refreshPlaces();legend();
+  M.setLayoutProperty('ae-heat','visibility',LAY.heat&&!T.alert?'visible':'none');
+  for(const id of ['ae-lines','ae-lines-case','ae-lines-lbl'])M.setLayoutProperty(id,'visibility',LAY.lines?'visible':'none');
+  const a=T.alert;M.getSource('ae-me').setData(a?fc([pt(a.ll,{})]):fc([]));M.getSource('ae-helpers').setData(a?fc(a.hll.map(h=>pt(h,{}))):fc([]));
+  if(a&&T.flown!==a.t0+String(a.ll)){T.flown=a.t0+String(a.ll);M.jumpTo({center:a.ll,zoom:15.4})}
+  const g=T.trip?.geo||T.plan?.geo||null;setRoute(g);
+}
+function mapView(){
+  if(mapOK===false)return mapViewSVG();
+  const p=T.plan,tr=T.trip,fmt=r=>`${(r.dist/1000).toFixed(1).replace('.',',')} km · ${Math.round(r.dur/60)} min à pied · ${r.safe} lieu${r.safe>1?'x':''} de sûreté à moins de 150 m`;
+  const field=(id,l)=>`<label class="f" for="${id}">${l}</label><div class="inrow"><input type="text" id="${id}" autocomplete="off" placeholder="Adresse, lieu, station…" value="${esc(T.form[id])}">${id==='from'?'<button class="btn ghost sm" data-act="locate">Ma position</button>':''}</div><div class="sug" id="sug-${id}"></div>`;
+  return `<h1>Carte et trajets</h1><p class="mute">Toulouse · fond de carte OpenStreetMap</p>
+  <div class="chips">${Object.entries(MF).map(([k,v])=>`<button class="${T.mf===k?'on':''}" data-mf="${k}">${v}</button>`).join('')}</div>
+  <div class="chips"><button class="${LAY.lines?'on':''}" data-act="tl">Métro et tram</button><button class="${LAY.heat?'on':''}" data-act="th">Zones signalées</button><button data-act="tn">${isNight?'Carte de jour':'Carte de nuit'}</button></div>
+  <div class="map ml" id="mslot">${mapOK===null?'<div class="loading">Chargement de la carte…</div>':''}</div>
+  <div class="legend" id="mlegend"></div>
+  ${LAY.heat?'<p class="note">Vue « ville intelligente » : densité des signalements anonymes. Pour la démo, ces données sont simulées.</p>':''}
+  <div class="card"><h3>${tr?'Trajet partagé':'Itinéraire à pied'}</h3>
+  ${tr?`<p><b>${esc(tr.a.n)}</b> → <b>${esc(tr.b.n)}</b></p><p class="mute">${fmt(tr)}</p><p class="mute">Vos proches voient votre progression. Sans nouvelles 10 minutes après l'heure prévue, ils sont alertés.</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>`:
+  `${field('from','Départ')}${field('to','Arrivée')}
+   <button class="btn" style="margin-top:12px" data-act="calc">Calculer l'itinéraire</button>
+   ${p?`<p style="margin-top:12px"><b>${esc(p.a.n)}</b> → <b>${esc(p.b.n)}</b></p><p class="mute">${fmt(p)}</p><button class="btn lv" data-act="trip2">Démarrer et prévenir mes proches</button>`:''}`}</div>
+  <p class="mute">Données © contributeurs OpenStreetMap · fond OpenFreeMap · recherche Photon · itinéraire FOSSGIS.</p>`;
+}
+let sugT=null;
+app.addEventListener('input',e=>{const t=e.target;if(t.id!=='from'&&t.id!=='to')return;T.form[t.id]=t.value;delete T.pickd[t.id];clearTimeout(sugT);
+  const box=document.getElementById('sug-'+t.id);if(t.value.trim().length<3){box.innerHTML='';return}
+  sugT=setTimeout(async()=>{try{const b=GEO.bbox,r=await get(`${SRC.geo}?q=${encodeURIComponent(t.value)}&limit=5&bbox=${b.join(',')}&lat=${GEO.center[1]}&lon=${GEO.center[0]}`);const j=await r.json();
+    T.sugs[t.id]=(j.features||[]).map(f=>{const p=f.properties||{};return{n:[p.name,p.street?(p.housenumber?p.housenumber+' ':'')+p.street:'',p.city].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(', '),ll:f.geometry.coordinates}});
+    box.innerHTML=T.sugs[t.id].map((s,i)=>`<button data-act="sug" data-f="${t.id}" data-i="${i}">${esc(s.n)}</button>`).join('')||'<small class="mute">Aucun résultat à Toulouse</small>'}catch(err){box.innerHTML='<small class="mute">Recherche indisponible</small>'}},400)});
+async function ensurePick(k){if(T.pickd[k])return T.pickd[k];const q=(T.form[k]||'').trim();if(!q)return null;
+  const b=GEO.bbox,r=await get(`${SRC.geo}?q=${encodeURIComponent(q)}&limit=1&bbox=${b.join(',')}`);const f=(await r.json()).features?.[0];if(!f)return null;return T.pickd[k]={n:q,ll:f.geometry.coordinates}}
+function mapAct(a,el){
+  if(a==='tl'){LAY.lines=!LAY.lines;render();return true}
+  if(a==='th'){LAY.heat=!LAY.heat;render();return true}
+  if(a==='tn'){if(M){theme(!isNight);render()}return true}
+  if(a==='sug'){const s=T.sugs[el.dataset.f][+el.dataset.i];T.pickd[el.dataset.f]=s;T.form[el.dataset.f]=s.n;render();return true}
+  if(a==='locate'){if(!navigator.geolocation){toast('Géolocalisation non disponible');return true}
+    navigator.geolocation.getCurrentPosition(p=>{const ll=[p.coords.longitude,p.coords.latitude];if(!inArea(ll)){toast('Vous êtes hors de Toulouse : la démo est centrée sur Toulouse');return}
+      T.pickd.from={n:'Ma position',ll};T.form.from='Ma position';render();M&&M.flyTo({center:ll,zoom:15.5})},()=>toast('Position refusée ou indisponible'),{enableHighAccuracy:true,timeout:8000});return true}
+  if(a==='calc'){(async()=>{try{const A=await ensurePick('from'),B=await ensurePick('to');if(!A||!B){toast('Adresse introuvable à Toulouse');return}
+      toast('Calcul de l\'itinéraire…');const r=await get(`${SRC.route}${A.ll[0]},${A.ll[1]};${B.ll[0]},${B.ll[1]}?overview=full&geometries=geojson`,{},15000);const j=await r.json();if(j.code!=='Ok'||!j.routes?.[0])throw 0;
+      const rt=j.routes[0],cs=rt.geometry.coordinates,all=[...MD.partners,...MD.places];
+      const safe=all.filter(f=>cs.some(c=>hav(c,f.geometry.coordinates)<150)).length;
+      T.plan={a:A,b:B,geo:rt.geometry,dist:rt.distance,dur:rt.duration,safe};render();
+      const bd=cs.reduce((b,c)=>[[Math.min(b[0][0],c[0]),Math.min(b[0][1],c[1])],[Math.max(b[1][0],c[0]),Math.max(b[1][1],c[1])]],[cs[0],cs[0]]);M&&M.fitBounds(bd,{padding:50,maxZoom:16})}
+    catch(err){toast('Itinéraire indisponible pour le moment')}})();return true}
+  if(a==='trip2'&&T.plan){T.trip=T.plan;T.plan=null;render();toast('Trajet partagé avec vos proches');return true}
+  return false;
+}
+render();
+}
+</script>
+</body>
+</html>
