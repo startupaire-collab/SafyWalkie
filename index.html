@@ -8,85 +8,97 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>AelySafe — V0</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/Satoshi-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/Antipasto-Regular.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <script src="vendor/maplibre-gl.js"></script>
 <style>
-/* VOICE: rassurante, claire, jamais anxiogène ; l'urgence réservée au seul bouton SOS
-   IDEA: une application mobile réelle, comme livrée sur un store — un réseau de loutres qui se tiennent la patte
-   PICTURE: le grand bouton SOS rond + la carte de Toulouse dessinée avec lieux de sûreté
-   COLOUR and TYPE: crème #fff9f2, corail #eb693e dominant, rose #db2777 pour l'alerte, lavande #8e8cf0 en support ; Nunito + Inter
-   LAYOUT: colonne d'app 440px ; au-dessus de 960px un panneau de présentation de la V0 à gauche */
+/* Charte graphique AelySafe (planches Couleurs, Typographie, Iconographie)
+   Couleurs : crème #fff9f2 (fond, 60 %), rose framboise #db2777 (primaire : SOS, actions, titres), orange #eb693e (secondaire),
+   mauve #8e8cf0 (rassurance), bleu ciel #b7f6ff (confirmation), prune #b22267 (liens, aplats sombres), encre #2b1d1a
+   Typo : Antipasto (logo, titres) + Satoshi Variable (texte). Éléments : traîne, épingle numérotée, trait tricolore */
+@font-face{font-family:"Antipasto";src:url(assets/Antipasto-Regular.otf) format("opentype");font-weight:400;font-display:swap}
+@font-face{font-family:"Satoshi";src:url(assets/Satoshi-Variable.ttf) format("truetype");font-weight:300 900;font-display:swap}
 :root{color-scheme:light dark;
---bg:light-dark(#fff9f2,#1a1420);--card:light-dark(#ffffff,#251d2c);--ink:light-dark(#2a1d24,#fbefe8);--mute:light-dark(#76646c,#b9a7b0);
---line:light-dark(#f0e2d8,#3a2e41);--co:#eb693e;--pk:#db2777;--lv:#8e8cf0;--sky:#b7f6ff;--soft:light-dark(#fdeee6,#33232a);--lvs:light-dark(#eeeefe,#2b2944);--ok:light-dark(#16794c,#5fd69a)}
+--bg:light-dark(#fff9f2,#1c1216);--card:light-dark(#ffffff,#2a1b21);--ink:light-dark(#2b1d1a,#fbefe8);--mute:light-dark(#6b5a54,#c4b0b6);
+--line:light-dark(#eadfd2,#43303a);--co:#eb693e;--pk:#db2777;--pr:#b22267;--lv:#8e8cf0;--sky:#b7f6ff;--soft:light-dark(#fbe9f1,#3a2330);--lvs:light-dark(#f4f4fe,#2d2b48);--ok:light-dark(#0e5560,#b7f6ff);--link:light-dark(#b22267,#ed93bb)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
-h1,h2,h3,.n{font-family:Nunito,system-ui,sans-serif;font-weight:900;line-height:1.1;margin:0;text-wrap:balance}
-h1{font-size:30px}h2{font-size:22px}h3{font-size:17px;font-weight:800}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Satoshi,system-ui,sans-serif;overflow-x:clip}
+a{color:var(--link)}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+h1,h2,.n{font-family:Antipasto,Satoshi,sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.02em}
+h1{font-size:30px;color:var(--pk)}h2{font-size:24px;color:var(--pk)}h3{font-family:Satoshi,sans-serif;font-size:17px;font-weight:700}
+h1::after{content:"";display:block;width:58px;height:6px;margin-top:10px;background:linear-gradient(90deg,var(--pk) 0 32px,transparent 32px 36px,var(--co) 36px 50px,transparent 50px 54px,var(--lv) 54px);border-radius:3px}
+.hero h1::after{margin-inline:auto}
 p{margin:.4em 0}small,.mute{color:var(--mute);font-size:13.5px}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr);min-height:100vh}
-.side{display:none}
+.side{display:none}.pagetraine{display:none}
+@media(min-width:960px){.pagetraine{display:block;position:fixed;right:0;bottom:0;z-index:0;line-height:0;pointer-events:none}}
 @media(min-width:960px){.wrap{grid-template-columns:minmax(0,1fr) 440px minmax(0,.35fr);gap:40px;padding:0 40px}
 .side{display:block;padding:56px 0;align-self:start;position:sticky;top:0;max-width:520px;justify-self:end}
 .app{border-inline:1px solid var(--line);box-shadow:0 0 60px #eb693e18}}
-.side h1{font-size:44px;margin:18px 0 10px}.side li{margin:6px 0}.side ul{padding-left:20px}
+.side h1{font-size:46px;margin:18px 0 10px}.side li{margin:6px 0}.side ul{padding-left:20px}
 .app{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;position:relative}
 .top{display:flex;align-items:center;gap:10px;padding:14px 18px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
 .top .n{font-size:20px}.top .sp{flex:1}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--soft);font-size:13px;font-weight:600;white-space:nowrap}
-.pill.ok{background:light-dark(#e3f6ec,#173326);color:var(--ok)}.pill.lv{background:var(--lvs);color:light-dark(#4b48b8,#c6c5ff)}
+.pill.ok{background:#b7f6ff;color:#0e3e45}.pill.lv{background:var(--lvs);color:light-dark(#4b48b8,#c6c5ff)}
 .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 main{flex:1;padding:18px 18px 110px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>.g{flex:1}
-.btn{font:700 16px Nunito,sans-serif;min-height:48px;padding:10px 18px;border-radius:14px;border:0;background:var(--co);color:#fff;cursor:pointer;width:100%}
-.btn.ghost{background:var(--soft);color:var(--ink)}.btn.lv{background:var(--lv)}.btn.pk{background:var(--pk)}.btn.sm{width:auto;min-height:44px;font-size:15px;padding:8px 14px}
+.btn{font:700 16px Satoshi,sans-serif;min-height:48px;padding:10px 18px;border-radius:14px;border:0;background:var(--pk);color:#fff;cursor:pointer;width:100%}
+.btn:hover{background:var(--pr)}.btn.ghost{background:var(--soft);color:var(--ink)}.btn.ghost:hover{background:light-dark(#f6d3e3,#4a2c3c)}.btn.lv{background:var(--lv);color:#2b1d1a}.btn.lv:hover{background:#a6a4f4}.btn.pk{background:var(--pk)}.btn.sm{width:auto;min-height:44px;font-size:15px;padding:8px 14px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 button:focus-visible,input:focus-visible,select:focus-visible,label:focus-within{outline:3px solid var(--lv);outline-offset:2px}
 label.f{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
-input[type=text],input[type=date],input[type=password],input[type=tel],select{width:100%;font:16px Inter,sans-serif;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);min-height:48px}
-.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 0;font-size:14.5px}.chk input{width:22px;height:22px;flex:none;accent-color:var(--co);margin-top:1px}
+input[type=text],input[type=date],input[type=password],input[type=tel],select{width:100%;font:16px Satoshi,sans-serif;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);min-height:48px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 0;font-size:14.5px}.chk input{width:22px;height:22px;flex:none;accent-color:var(--pk);margin-top:1px}
 .opt{display:flex;gap:12px;align-items:center;border:2px solid var(--line);border-radius:16px;padding:14px;margin:8px 0;cursor:pointer;background:var(--card)}
-.opt.on{border-color:var(--co);background:var(--soft)}.opt input{accent-color:var(--co);width:20px;height:20px}
+.opt.on{border-color:var(--pk);background:var(--soft)}.opt input{accent-color:var(--pk);width:20px;height:20px}
 .err{color:var(--pk);font-weight:600;font-size:14px}
 .steps{display:flex;gap:6px;margin:4px 0 18px}.steps i{flex:1;height:5px;border-radius:9px;background:var(--line)}.steps i.on{background:var(--co)}
 nav.tabs{position:fixed;bottom:0;width:100%;max-width:440px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
 @media(min-width:960px){nav.tabs{width:440px}}
-nav.tabs button{background:none;border:0;color:var(--mute);font:600 12px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;cursor:pointer;border-radius:12px}
-nav.tabs button.on{color:var(--co)}nav.tabs svg{width:24px;height:24px}
+nav.tabs button{background:none;border:0;color:var(--mute);font:600 12px Satoshi,sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;cursor:pointer;border-radius:12px}
+nav.tabs button.on{color:var(--pk)}nav.tabs svg{width:24px;height:24px}
 .sos{display:grid;place-items:center;margin:8px auto 4px;width:min(250px,70vw);aspect-ratio:1;position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
-.sos button{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;border:0;cursor:pointer;color:#fff;font:900 46px Nunito,sans-serif;background:radial-gradient(circle at 35% 30%,#ff8a63,var(--co) 45%,var(--pk));box-shadow:0 18px 40px #db277755,inset 0 -10px 30px #0002,inset 0 6px 14px #fff5}
-.sos button span{display:block;font:600 14px Inter,sans-serif;opacity:.92;margin-top:2px}
+.sos button{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;border:0;cursor:pointer;color:#fff;font:400 54px Antipasto,Satoshi,sans-serif;background:radial-gradient(circle at 35% 30%,#ea5aa0,#db2777 48%,#b22267);box-shadow:0 18px 40px #db277755,inset 0 -10px 30px #0002,inset 0 6px 14px #fff5}
+.sos button span{display:block;font:600 14px Satoshi,sans-serif;opacity:.92;margin-top:2px}
 .sos svg{position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);pointer-events:none;transform:rotate(-90deg)}
 .halo{position:absolute;inset:0;pointer-events:none;border-radius:50%;background:var(--pk);opacity:.18;animation:pulse 2.4s infinite}
 @keyframes pulse{0%{transform:scale(.95);opacity:.25}70%{transform:scale(1.18);opacity:0}100%{opacity:0}}
 @media(prefers-reduced-motion:reduce){.halo,.live{animation:none!important}}
-.alert{background:linear-gradient(160deg,var(--pk),#9d174d);color:#fff;border-radius:24px;padding:20px;margin:8px 0}
-.alert .big{font:900 44px Nunito,sans-serif;white-space:nowrap}
+.alert{background:linear-gradient(160deg,var(--pk),var(--pr));color:#fff;border-radius:24px;padding:20px;margin:8px 0;position:relative;overflow:hidden;isolation:isolate}
+.alert .big{font-family:Antipasto,Satoshi,sans-serif;font-weight:400}
+.traine{position:absolute;right:0;bottom:0;z-index:-1;line-height:0;pointer-events:none}
+.alert .big{font:900 44px Satoshi,sans-serif;white-space:nowrap}
 .live{animation:blink 1.2s infinite}@keyframes blink{50%{opacity:.35}}
 .map{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:light-dark(#f6efe6,#221b28);aspect-ratio:4/5}
 .map svg{position:absolute;inset:0;width:100%;height:100%}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}.chips button{flex:none;min-height:40px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;font:600 14px Inter;cursor:pointer}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}.chips button{flex:none;min-height:40px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;font:600 14px Satoshi;cursor:pointer}
 .chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.li:last-child{border:0}
-.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font:800 15px Nunito,system-ui,sans-serif;color:#fff;background:var(--lv)}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-family:Nunito;font-weight:800}
-.code{font:800 22px Nunito;letter-spacing:.06em;white-space:nowrap}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font:700 15px Satoshi,system-ui,sans-serif;color:#2b1d1a;background:var(--lv)}
+.ic[style*='--pk'],.ic[style*='--pr'],.ic[style*='#db2777'],.ic[style*='#b22267'],.ic[style*='#16a06a'],.ic[style*='#2a5bd7'],.ic[style*='#e23b3b'],.ic[style*='#2a8fa3']{color:#fff}
+.ic[style*='--ok']{background:#b7f6ff!important;color:#0e3e45}
+.pin{position:relative;width:30px;height:40px;flex:none}.pin svg{display:block}.pin b{position:absolute;left:0;right:0;top:7px;text-align:center;font-size:13px;color:#fff}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-family:Satoshi;font-weight:800}
+.code{font:800 22px Satoshi;letter-spacing:.06em;white-space:nowrap}
 .note{font-size:13px;color:var(--mute);border-left:3px solid var(--lv);padding-left:10px;margin:10px 0}
 .modal{position:fixed;inset:0;background:#0007;display:grid;place-items:end center;z-index:20;padding:12px}
-.modal .card{width:100%;max-width:420px;margin:0}
-.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:30;max-width:90vw}
+.modal .card{width:100%;max-width:420px;margin:0;max-height:88vh;overflow:auto}
+.recrow{display:block}.recrow .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.recrow a.btn{display:inline-grid;place-items:center;text-decoration:none}
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));box-shadow:0 8px 24px #2b1d1a33;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:30;max-width:90vw}
 .prev{width:72px;height:72px;border-radius:14px;object-fit:cover;background:var(--soft)}
 .bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--co)}
 .map.ml{aspect-ratio:auto;height:min(62vh,520px);background:var(--soft)}.map.ml.sm{height:300px}
 .mlhost{position:absolute;inset:0}.loading{display:grid;place-items:center;height:100%;color:var(--mute);font-weight:600}
-.maplibregl-popup-content{font:14px/1.4 Inter,sans-serif;border-radius:12px;padding:10px 12px;color:#2a1d24}
+.maplibregl-popup-content{font:14px/1.4 Satoshi,sans-serif;border-radius:12px;padding:10px 12px;color:#2a1d24}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--mute);margin:8px 0}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
 .legend .ln{width:16px;height:4px;border-radius:2px}
-.sug{display:grid;gap:4px;margin-top:4px}.sug button{text-align:left;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;font:15px Inter,sans-serif;cursor:pointer}
+.sug{display:grid;gap:4px;margin-top:4px}.sug button{text-align:left;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;font:15px Satoshi,sans-serif;cursor:pointer}
 .inrow{display:flex;gap:8px}.inrow input{flex:1}
 .recl{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-weight:600;font-size:14px}.recdot{width:10px;height:10px;border-radius:50%;background:#fff;flex:none}
 .hero{text-align:center;padding:24px 4px}.hero svg{width:150px;height:auto}
@@ -95,9 +107,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 <body>
 <div class="wrap">
   <aside class="side">
-    <svg width="64" height="78" viewBox="0 0 100 122" aria-hidden="true"><use href="#otter"/></svg>
+    <img src="assets/logo.png" alt="Logo AelySafe" width="70" height="95">
     <h1>AelySafe, version 0</h1>
-    <p>Prototype cliquable de l'application de sécurité personnelle, pensé pour le pilote à Toulouse. Tout fonctionne en simulation dans votre navigateur : aucune donnée ne quitte l'appareil.</p>
+    <p>Prototype cliquable de l'application de sécurité personnelle, pensé pour le pilote à Toulouse. Identité, objet connecté et modération sont simulés. La carte, l'enregistrement audio et les alertes entre téléphones fonctionnent en vrai ; les enregistrements restent sur le téléphone.</p>
     <ul>
       <li>Inscription réservée aux majeurs, avec pièce d'identité et selfie en direct</li>
       <li>Ouvert aux femmes et aux hommes majeurs ; comptes refusés ou bannis pour les auteurs d'agressions</li>
@@ -112,6 +124,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
     <p class="note">En cas de danger réel : 17 (police), 112 (urgences), 114 (par SMS).</p>
   </aside>
   <div class="app" id="app"></div>
+  <div class="pagetraine" aria-hidden="true"><svg width="260" height="156" viewBox="0 0 200 120"><path d="M200 0 C150 30 110 70 90 120 L200 120 Z" fill="#b7f6ff"/><path d="M200 30 C160 55 135 85 125 120 L200 120 Z" fill="#db2777"/><path d="M200 62 C175 78 162 98 158 120 L200 120 Z" fill="#b22267"/></svg></div>
   <div></div>
 </div>
 
@@ -189,8 +202,8 @@ function mapSVG(opts={}){
   <path d="M40 0 C70 80 130 120 112 190 C96 250 92 290 120 340 C140 380 120 420 90 450" stroke="#7fd6e6" stroke-width="2" fill="none" opacity=".7"/>
   <path d="M30 330 L78 288 L160 268 L170 222 L222 205 L270 132 L320 60" stroke="#e23b3b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M120 40 L150 140 L222 205 L252 248 L178 400 L200 445" stroke="#f2b705" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  ${SPOTS.map(s=>`<circle cx="${s.x}" cy="${s.y}" r="4" fill="#fff" stroke="#2a1d24" stroke-width="1.5"/><text x="${s.x+7}" y="${s.y-6}" font-size="10.5" font-family="Inter" font-weight="600" fill="currentColor" style="paint-order:stroke;stroke:var(--bg);stroke-width:3px">${s.n}</text>`).join('')}
-  <text x="20" y="440" font-size="11" font-family="Nunito" font-weight="800" fill="#2a8fa3">Garonne</text>
+  ${SPOTS.map(s=>`<circle cx="${s.x}" cy="${s.y}" r="4" fill="#fff" stroke="#2a1d24" stroke-width="1.5"/><text x="${s.x+7}" y="${s.y-6}" font-size="10.5" font-family="Satoshi" font-weight="600" fill="currentColor" style="paint-order:stroke;stroke:var(--bg);stroke-width:3px">${s.n}</text>`).join('')}
+  <text x="20" y="440" font-size="11" font-family="Satoshi" font-weight="800" fill="#2a8fa3">Garonne</text>
   ${route}${helpers}
   ${ps.map(p=>`<g data-act="pick" data-id="${p.id}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="16" fill="transparent"/><path d="M${p.x} ${p.y+2}c-5-6-11-10-11-17a11 11 0 0 1 22 0c0 7-6 11-11 17z" fill="${TCOL[p.t]}" stroke="#fff" stroke-width="2.5" ${T.sel===p.id?'transform="translate(0 -3)"':''}/><path d="M${p.x-4} ${p.y-15}l3 3 6-6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>`).join('')}
   ${me}
@@ -203,11 +216,11 @@ function onb(){
   const bar=st>0?`<div class="steps">${Array.from({length:total},(_,i)=>`<i class="${i<st?'on':''}"></i>`).join('')}</div>`:'';
   const back=st>0?`<button class="btn ghost sm" data-act="back">Retour</button>`:'';
   let h='';
-  if(st===0)h=`<div class="hero"><svg viewBox="0 0 100 122"><use href="#otter"/></svg>
+  if(st===0)h=`<div class="hero"><img src="assets/logo.png" alt="Logo AelySafe" width="130" height="177" style="display:block;margin:0 auto">
     <h1 style="margin-top:14px">AelySafe</h1><p class="mute" style="font-size:16px">Comme les loutres qui se tiennent la patte pour ne pas dériver, on ne vous laisse pas seul·e dehors.</p></div>
-    <div class="card"><div class="li"><div class="ic" style="background:var(--pk)">1</div><div>Un appui sur votre bracelet ou votre montre déclenche l'alerte.</div></div>
-    <div class="li"><div class="ic" style="background:var(--co)">2</div><div>Vos proches et les aidants vérifiés autour de vous reçoivent votre position en temps réel.</div></div>
-    <div class="li"><div class="ic">3</div><div>Les lieux de sûreté partenaires vous accueillent sur votre trajet.</div></div></div>
+    <div class="card"><div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>1</b></span><div>Un appui sur votre bracelet ou votre montre déclenche l'alerte.</div></div>
+    <div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>2</b></span><div>Vos proches et les aidants vérifiés autour de vous reçoivent votre position en temps réel.</div></div>
+    <div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>3</b></span><div>Les lieux de sûreté partenaires vous accueillent sur votre trajet.</div></div></div>
     <button class="btn" data-act="next">Créer mon compte</button><p class="mute" style="text-align:center">Pour les femmes et les hommes majeurs. Identité vérifiée pour tout le monde.</p>`;
   if(st===1)h=`<h2>Qui êtes-vous ?</h2><p class="mute">Ces informations restent privées. Les autres utilisateurs ne voient que votre prénom.</p>
     <label class="f" for="fn">Prénom</label><input type="text" id="fn" autocomplete="given-name" value="${esc(S.user.fn)}">
@@ -229,7 +242,7 @@ function onb(){
     <p class="note">V0 : la vérification est simulée. En production, elle sera confiée à un prestataire certifié (contrôle du document et détection du vivant).</p>`;
   const sec=3;
   if(st===sec)h=`<h2>Votre sécurité</h2><p class="mute">Ce code à 4 chiffres sert à annuler une alerte. Personne d'autre ne peut l'arrêter à votre place.</p>
-    <label class="f" for="pin">Code d'annulation</label><input type="password" id="pin" inputmode="numeric" maxlength="4" value="${esc(S.pin)}" style="font:800 22px Nunito;letter-spacing:.4em">
+    <label class="f" for="pin">Code d'annulation</label><input type="password" id="pin" inputmode="numeric" maxlength="4" value="${esc(S.pin)}" style="font:800 22px Satoshi;letter-spacing:.4em">
     <div class="card"><label class="chk"><input type="checkbox" id="c1" ${S.user.c1?'checked':''}><span>J'accepte la politique de confidentialité et le traitement de mes données personnelles pour le fonctionnement du service (RGPD).</span></label>
     <label class="chk"><input type="checkbox" id="c2" ${S.user.c2?'checked':''}><span>J'accepte la charte d'entraide : si j'aide quelqu'un, j'interviens sans violence, je reste visible et j'appelle les secours si nécessaire.</span></label>
     <label class="chk"><input type="checkbox" id="c3" ${S.user.c3!==false?'checked':''}><span>J'accepte que mes signalements soient conservés de façon anonyme pour améliorer la sécurité des villes. <small>(facultatif, modifiable à tout moment)</small></span></label></div>
@@ -237,7 +250,7 @@ function onb(){
   if(st===sec+1)h=`<h2>Votre objet connecté</h2><p class="mute">Il déclenche l'alerte d'un geste, sans sortir votre téléphone.</p>
     ${[['watch','J\'ai déjà une montre connectée','Apple Watch, Wear OS, Garmin… L\'application est gratuite.'],['band','Je veux le bracelet AelySafe','Bracelet discret avec puce, appui long pour alerter. Prix à définir.'],['key','Je veux le porte-clés AelySafe','Même fonctionnement, à accrocher à son sac. Prix à définir.']].map(([v,t,d])=>`<label class="opt ${S.device===v?'on':''}"><input type="radio" name="dev" value="${v}" ${S.device===v?'checked':''}><span class="g"><b>${t}</b><br><small>${d}</small></span></label>`).join('')}`;
   const last=st===sec+1;
-  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span><span class="sp"></span>${back}</div>
+  app.innerHTML=`<div class="top"><img src="assets/logo.png" alt="" width="24" height="33" style="display:block"><span class="n" style="color:var(--link);font-size:22px;letter-spacing:.06em">AelySafe</span><span class="sp"></span>${back}</div>
   <main>${bar}${h}${T.err?`<p class="err" role="alert">${esc(T.err)}</p>`:''}
   ${st>0?`<button class="btn" style="margin-top:16px" data-act="${last?'finish':'next'}" ${st===2&&T.verif!=='ok'?'disabled':''}>${last?'Terminer l\'inscription':'Continuer'}</button>`:''}</main>`;
 }
@@ -272,15 +285,15 @@ function home(){
 function alertView(){
   const a=T.alert,s=Math.floor((Date.now()-a.t0)/1000),mm=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
   const near=PLACES.map(p=>({...p,d:Math.round(Math.hypot(p.x-a.me.x,p.y-a.me.y)*6)})).sort((x,y)=>x.d-y.d).slice(0,3);
-  return `<div class="alert"><div class="row"><span class="pill" style="background:#fff3;color:#fff"><span class="dot live"></span>${a.silent?'Alerte silencieuse':'Alerte en cours'}</span><span class="sp g"></span><span class="big" id="clock">${mm}:${ss}</span></div>
+  return `<div class="alert"><div class="traine" aria-hidden="true"><svg width="120" height="72" viewBox="0 0 200 120"><path d="M200 0 C150 30 110 70 90 120 L200 120 Z" fill="#b7f6ff"/><path d="M200 30 C160 55 135 85 125 120 L200 120 Z" fill="#ed93bb"/><path d="M200 62 C175 78 162 98 158 120 L200 120 Z" fill="#fff9f2"/></svg></div><div class="row"><span class="pill" style="background:#fff3;color:#fff"><span class="dot live"></span>${a.silent?'Alerte silencieuse':'Alerte en cours'}</span><span class="sp g"></span><span class="big" id="clock">${mm}:${ss}</span></div>
   <p style="margin-top:10px">Votre position est partagée en temps réel près de <b>${esc(a.spot)}</b>.</p>
   <p class="recl">${a.rec.state==='on'?'<span class="recdot live"></span>Enregistrement audio en cours':a.rec.state==='off'?esc(a.rec.why):'Activation du micro…'}</p>
   <div class="row" style="margin-top:6px"><span class="pill" style="background:#fff2;color:#fff">${S.contacts.length} proche${S.contacts.length>1?'s':''} prévenu${S.contacts.length>1?'s':''}</span><span class="pill" style="background:#fff2;color:#fff">${a.helpers.length} aidants vérifiés à proximité</span></div></div>
-  <div class="card" ${a.coming.length?'style="border:2px solid var(--ok)"':''}><h3>Aide en route</h3>${a.coming.length?a.coming.map(n=>`<div class="li"><div class="ic" style="background:var(--ok)">${esc(n[0]||'?')}</div><div class="g"><b>${esc(n)}</b> a accepté votre appel et arrive</div></div>`).join(''):
+  <div class="card" ${a.coming.length?'style="background:#b7f6ff;border-color:#b7f6ff;color:#2b1d1a"':''}><h3>Aide en route</h3>${a.coming.length?a.coming.map(n=>`<div class="li"><div class="ic" style="background:var(--ok)">${esc(n[0]||'?')}</div><div class="g"><b>${esc(n)}</b> a accepté votre appel et arrive</div></div>`).join(''):
    `<p class="mute">Les aidants vérifiés autour de vous sont prévenus. Une vibration et une notification vous avertiront dès que l'un d'eux accepte.</p><button class="btn ghost" data-act="fakeacc">Simuler : un aidant accepte (démo sur un seul téléphone)</button>`}</div>
   ${mapOK?`<div class="map ml sm" id="mslot"></div>`:`<div class="map" style="aspect-ratio:4/4">${mapSVG({me:a.me,helpers:a.helpers})}</div>`}
   <div class="card"><h3>Lieux de sûreté les plus proches</h3>${mapOK?nearReal(a.ll):near.map(p=>`<div class="li"><div class="ic" style="background:${TCOL[p.t]}">✓</div><div class="g">${esc(p.n)}<br><small>Ouvert ${esc(p.h)}</small></div><b style="white-space:nowrap">${p.d} m</b></div>`).join('')}</div>
-  <div class="card"><h3>Je suis en sécurité</h3><label class="f" for="cpin">Code d'annulation</label><input type="password" id="cpin" inputmode="numeric" maxlength="4" style="font:800 22px Nunito;letter-spacing:.4em">
+  <div class="card"><h3>Je suis en sécurité</h3><label class="f" for="cpin">Code d'annulation</label><input type="password" id="cpin" inputmode="numeric" maxlength="4" style="font:800 22px Satoshi;letter-spacing:.4em">
   ${T.err?`<p class="err">${esc(T.err)}</p>`:''}<button class="btn lv" style="margin-top:10px" data-act="cancel">Arrêter l'alerte</button></div>
   <p class="note">Appelez le 17 ou le 112 si la situation s'aggrave.</p>`;
 }
@@ -306,7 +319,7 @@ function helpView(){
    ${T.going?`<h3 style="margin-top:12px">Vous êtes en route</h3>${inc.real?'<p class="mute">La personne a reçu une vibration et une notification : elle sait que vous arrivez.</p>':''}<ol style="padding-left:20px"><li>Restez visible et parlez calmement, comme à une connaissance.</li><li>N'intervenez jamais physiquement.</li><li>Appelez le 17 si la situation est dangereuse.</li><li>Proposez d'accompagner la personne vers un lieu de sûreté.</li></ol><button class="btn ghost" data-act="helpdone">La personne est en sécurité</button><button class="btn ghost" style="margin-top:8px" data-act="flag">Signaler un comportement suspect</button>`:
    `<label class="chk"><input type="checkbox" id="charte"><span>Je m'engage à intervenir sans violence et à respecter la charte d'entraide. Je reste responsable de mes actes.</span></label>
    <div class="row"><button class="btn g" data-act="go">J'y vais</button><button class="btn ghost g" data-act="decline">Je ne peux pas</button></div>`}</div>`:
-  `<div class="card" style="text-align:center"><svg width="70" height="86" viewBox="0 0 100 122"><use href="#otter"/></svg><p class="mute">${S.helper?(ESN?'Connecté au réseau : vous serez prévenu·e par une vibration et une notification si quelqu\'un lance une alerte.':'Aucune alerte autour de vous.'):'Activez la disponibilité pour recevoir les alertes.'}</p>
+  `<div class="card" style="text-align:center"><img src="assets/logo.png" alt="" width="64" height="87" style="display:block;margin:0 auto 6px"><p class="mute">${S.helper?(ESN?'Connecté au réseau : vous serez prévenu·e par une vibration et une notification si quelqu\'un lance une alerte.':'Aucune alerte autour de vous.'):'Activez la disponibilité pour recevoir les alertes.'}</p>
    <button class="btn ghost" data-act="simin" ${S.helper?'':'disabled'}>Simuler une alerte à proximité</button></div>`}
   ${notifCard()}
   <div class="card"><h3>La charte d'entraide</h3><p>AelySafe met en relation, il n'organise pas d'intervention. L'aidant agit de sa propre initiative, sans violence, et ne remplace pas les forces de l'ordre.</p></div>`;
@@ -348,7 +361,7 @@ function meView(){
 }
 
 function banned(){
-  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span></div>
+  app.innerHTML=`<div class="top"><img src="assets/logo.png" alt="" width="24" height="33" style="display:block"><span class="n" style="color:var(--link);font-size:22px;letter-spacing:.06em">AelySafe</span></div>
   <main><div class="card" style="border:2px solid var(--pk);margin-top:24px"><h2>Inscription refusée</h2>
   <p>Cette identité est liée à un compte banni de la communauté AelySafe, à la suite de signalements confirmés.</p>
   <p class="mute">Le bannissement est définitif et lié à la pièce d'identité : créer un nouveau compte avec le même document est impossible. Une contestation est possible auprès de l'équipe de modération (startupaire@gmail.com).</p></div>
@@ -359,13 +372,14 @@ function render(){
   if(!S.onb)return onb();
   const views={home,map:mapView,help:helpView,net:netView,me:meView};
   const tabs=[['home','Accueil'],['map','Carte'],['help','Aider'],['net','Réseau'],['me','Compte']];
-  app.innerHTML=`<div class="top"><svg width="26" height="32" viewBox="0 0 100 122"><use href="#otter"/></svg><span class="n">AelySafe</span><span class="sp"></span>
+  app.innerHTML=`<div class="top"><img src="assets/logo.png" alt="" width="24" height="33" style="display:block"><span class="n" style="color:var(--link);font-size:22px;letter-spacing:.06em">AelySafe</span><span class="sp"></span>
   ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.paired?`<span class="pill ok"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'}</span>`:'<span class="pill">Non appairé</span>'}</div>
   <main>${views[S.tab]()}</main>
   <nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}</nav>
   ${T.modal||''}`;
   afterRender();
   if(S.tab==='me')fillRecs();
+  if(T.modal&&T.lastRec)fillLastRec();
 }
 
 /* ---------- alerte ---------- */
@@ -381,7 +395,8 @@ function startAlert(silent){
 }
 function bindSOS(){}
 function reportModal(){
-  T.modal=`<div class="modal"><div class="card"><h2>Alerte terminée</h2><p class="mute">Voulez-vous signaler ce qui s'est passé ? Le signalement est anonyme : ni votre nom ni votre position exacte ne sont transmis.</p>
+  T.modal=`<div class="modal"><div class="card"><h2>Alerte terminée</h2>
+  <div id="lastrec">${T.lastRec?'<p class="mute">Préparation de votre enregistrement audio…</p>':''}</div><p class="mute">Voulez-vous signaler ce qui s'est passé ? Le signalement est anonyme : ni votre nom ni votre position exacte ne sont transmis.</p>
   <label class="f" for="rt">Type</label><select id="rt">${REPORT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
   <label class="f" for="rc">Où étiez-vous ?</label><select id="rc">${CONTEXTS.map(t=>`<option>${t}</option>`).join('')}</select>
   <label class="chk"><input type="checkbox" id="ru"><span>Un aidant ou un utilisateur AelySafe a eu un comportement inapproprié. <small>Ce signalement-là n'est pas anonyme : il est transmis à la modération.</small></span></label>
@@ -415,11 +430,11 @@ document.addEventListener('click',e=>{
   if(a==='sos'||a==='press')startAlert(false);
   if(a==='silent')startAlert(true);
   if(a==='cancel'){const v=$('#cpin').value;if(v!==S.pin){T.err='Code incorrect. L\'alerte continue.';render();return}
-    clearInterval(tick);stopRec();netEnd();T.alert=null;T.err='';reportModal();render()}
+    clearInterval(tick);T.lastRec=T.alert.rec.state==='on'?'r'+T.alert.t0:null;stopRec();netEnd();T.alert=null;T.err='';reportModal();render()}
   if(a==='sendrep'){const h=new Date().getHours(),sl=String(Math.floor(h/3)*3).padStart(2,'0');
     S.reports.push({type:$('#rt').value,ctx:$('#rc').value,zone:'TLS-'+(Math.floor(Math.random()*40)+100),slot:`${sl}h–${String((+sl+3)%24).padStart(2,'0')}h`});
-    const ru=$('#ru').checked;T.modal=null;save();render();toast(ru?'Merci. Le compte concerné est suspendu le temps de la vérification.':'Signalement anonyme envoyé. Merci.')}
-  if(a==='skiprep'){T.modal=null;render()}
+    const ru=$('#ru').checked;T.modal=null;T.lastRec=null;save();render();toast(ru?'Merci. Le compte concerné est suspendu le temps de la vérification.':'Signalement anonyme envoyé. Merci.')}
+  if(a==='skiprep'){T.modal=null;T.lastRec=null;T.modalPrev=null;render()}
   if(a==='pick'){T.sel=el.dataset.id;render()}
   if(a==='trip'){const A=SPOTS[$('#ta').value],B=SPOTS[$('#tb').value];if(A===B){toast('Choisissez deux lieux différents');return}T.trip={a:A,b:B};render();toast('Trajet partagé avec vos proches')}
   if(mapAct(a,el)||liveAct(a,el))return;
@@ -641,18 +656,31 @@ async function startRec(){const a=T.alert;if(!a)return;
     const mr=new MediaRecorder(st,type?{mimeType:type}:undefined),chunks=[];
     mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
     mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mr.mimeType||type||'audio/webm'});
-      if(blob.size)idbPut('audio',{id:'r'+a.t0,t0:a.t0,dur:Math.round((Date.now()-a.t0)/1000),type:blob.type,blob}).then(()=>{toast('Enregistrement audio sauvegardé dans Compte');if(S.tab==='me')fillRecs()},()=>toast('Enregistrement impossible à sauvegarder'))};
+      if(blob.size)idbPut('audio',{id:'r'+a.t0,t0:a.t0,dur:Math.round((Date.now()-a.t0)/1000),type:blob.type,blob}).then(()=>{toast('Enregistrement audio sauvegardé');if(S.tab==='me')fillRecs();fillLastRec()},()=>toast('Enregistrement impossible à sauvegarder'))};
     mr.start(5000);REC=mr;a.rec={state:'on'};render();
   }catch(e){a.rec={state:'off',why:'Micro refusé : l\'alerte continue sans audio'};render()}}
 function stopRec(){if(REC&&REC.state!=='inactive')try{REC.stop()}catch(e){}REC=null}
 const fmtDur=d=>`${Math.floor(d/60)} min ${String(d%60).padStart(2,'0')} s`;
+function recExt(t){return /mp4|m4a|aac/.test(t)?'m4a':/ogg/.test(t)?'ogg':'webm'}
+function recHTML(r){const u=URL.createObjectURL(r.blob),d=new Date(r.t0);RECURLS.push(u);
+  const nm=`AelySafe_alerte_${d.toISOString().slice(0,10)}_${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}.${recExt(r.type||'')}`;
+  return `<div class="li recrow"><div class="row"><b class="g">${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</b><small>${fmtDur(+r.dur||0)}</small></div>
+  <audio controls preload="metadata" src="${u}" style="width:100%;margin:6px 0"></audio>
+  <div class="acts"><a class="btn ghost sm" href="${u}" download="${esc(nm)}">Télécharger</a><button class="btn ghost sm" data-act="askdel" data-id="${esc(r.id)}">Supprimer</button></div></div>`}
 async function fillRecs(){const el=document.getElementById('reclist');if(!el)return;let all;
   try{all=(await idbAll('audio')).sort((a,b)=>b.t0-a.t0)}catch(e){el.innerHTML='<p class="mute">Stockage indisponible sur ce navigateur.</p>';return}
   const box=document.getElementById('reclist');if(!box)return;RECURLS.forEach(u=>URL.revokeObjectURL(u));RECURLS=[];
-  box.innerHTML=all.length?all.map(r=>{const u=URL.createObjectURL(r.blob),d=new Date(r.t0);RECURLS.push(u);
-    return `<div class="li" style="display:block"><div class="row"><b class="g">${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</b><small>${fmtDur(+r.dur||0)}</small></div>
-    <audio controls preload="metadata" src="${u}" style="width:100%;margin:6px 0"></audio><button class="btn ghost sm" data-act="delrec" data-id="${esc(r.id)}">Supprimer</button></div>`}).join('')
-   :'<p class="mute">Aucun enregistrement pour l\'instant.</p>'}
+  box.innerHTML=all.length?all.map(recHTML).join(''):'<p class="mute">Aucun enregistrement pour l\'instant.</p>'}
+async function fillLastRec(){const el=document.getElementById('lastrec');if(!el)return;if(!T.lastRec){el.innerHTML='';return}let r=null;try{r=await idbGet('audio',T.lastRec)}catch(e){}
+  const box=document.getElementById('lastrec');if(!box)return;
+  if(r)box.innerHTML='<p style="margin:12px 0 4px"><b>Votre enregistrement audio</b></p><p class="mute" style="margin:0">Vous pouvez le réécouter ou le télécharger maintenant. Il reste aussi disponible dans Compte.</p>'+recHTML(r)}
+function askDel(id){T.modalPrev=T.modal;T.delId=id;
+  T.modal=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="dt"><div class="card"><h2 id="dt">Êtes-vous sûr de vouloir supprimer ?</h2>
+  <p>L'enregistrement audio sera effacé définitivement. Il ne pourra plus servir de preuve.</p>
+  <label class="f" for="dpin">Entrez votre code PIN pour confirmer</label><input type="password" id="dpin" inputmode="numeric" maxlength="4" autocomplete="off" style="font:700 22px Satoshi;letter-spacing:.4em">
+  <p class="err" id="dperr" role="alert"></p>
+  <div class="row" style="margin-top:8px"><button class="btn pk g" data-act="dodel">Supprimer</button><button class="btn ghost g" data-act="nodel">Annuler</button></div></div></div>`;
+  render();const f=document.getElementById('dpin');if(f)f.focus()}
 
 /* ---------- notifications et vibration ---------- */
 const canNotif=()=>'Notification' in window;
@@ -691,10 +719,14 @@ function onNet(o){if(typeof o.id!=='string'||!/^aelysafe-a-[a-z0-9]{8,20}$/.test
 function liveAct(a,el){
   if(a==='notif'){if(!canNotif())return true;Notification.requestPermission().then(()=>{if(S.onb)render();else el.outerHTML=Notification.permission==='granted'?'<span class="pill ok"><span class="dot"></span>Activées</span>':'<p class="err">Notifications refusées.</p>'});return true}
   if(a==='fakeacc'){el.disabled=true;el.textContent='Un aidant va accepter…';setTimeout(()=>helperComing(['Camille','Léa','Thomas','Inès','Yanis'][Math.floor(Math.random()*5)]),1500);return true}
-  if(a==='delrec'){idbDel('audio',el.dataset.id).then(fillRecs,()=>{});return true}
+  if(a==='askdel'){askDel(el.dataset.id);return true}
+  if(a==='nodel'){T.modal=T.modalPrev||null;T.modalPrev=null;T.delId=null;render();return true}
+  if(a==='dodel'){const v=($('#dpin')||{}).value;if(v!==S.pin){const e=$('#dperr');if(e)e.textContent='Code PIN incorrect. L\'enregistrement n\'a pas été supprimé.';return true}
+    const id=T.delId;idbDel('audio',id).then(()=>{if(T.lastRec===id)T.lastRec=null;T.modal=T.modalPrev||null;T.modalPrev=null;T.delId=null;render();toast('Enregistrement supprimé')},()=>toast('Suppression impossible'));return true}
   if(a==='seeinc'){const i=T.incoming;if(!i||!i.ll)return true;T.pickd.to={n:i.n+' (alerte)',ll:i.ll};T.form.to=T.pickd.to.n;
     if(myLL&&inArea(myLL)){T.pickd.from={n:'Ma position',ll:myLL};T.form.from='Ma position'}T.plan=null;S.tab='map';render();window.scrollTo(0,0);if(T.pickd.from)mapAct('calc');return true}
   return false}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dpin'){e.preventDefault();const b=document.querySelector('[data-act=dodel]');b&&b.click()}if(e.key==='Escape'&&T.delId){const b=document.querySelector('[data-act=nodel]');b&&b.click()}});
 helperNet();
 if(S.onb)initMap().then(()=>{if(T.alert||S.tab==='map')render()});
 render();
