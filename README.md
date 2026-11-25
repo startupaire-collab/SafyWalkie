@@ -6,8 +6,8 @@ Prototype cliquable de l'application de sécurité personnelle AelySafe (Challen
 
 ## Fonctionnalités de la V0
 - Inscription réservée aux 18 ans et plus, vérification pièce d'identité + selfie en direct (simulée)
-- Ouvert aux femmes et aux hommes majeurs, sans marrainage
-- Protection de la communauté : signalement d'un utilisateur, suspension immédiate, bannissement définitif lié à l'empreinte de la pièce d'identité (démo du refus : nom de famille `Test-Banni`)
+- Ouvert à toute personne de 18 ans et plus, sans marrainage
+- Protection de la communauté : signalement d'un membre, suspension immédiate, bannissement définitif lié à l'empreinte de la pièce d'identité (démo du refus : nom de famille `Test-Banni`)
 - Piste à valider : contrôle des antécédents d'agression avec les autorités (fichiers réservés aux organismes autorisés par la loi)
 - Bouton SOS : un appui lance l'alerte immédiatement (bracelet / montre / porte-clés simulés), alerte silencieuse, annulation par code PIN
 - Enregistrement audio automatique pendant toute l'alerte (micro du téléphone) : réécoute et téléchargement dès la fin de l'alerte, puis dans Compte ; suppression seulement après confirmation et code PIN

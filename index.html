@@ -130,13 +130,13 @@ body.fullmap .app{min-height:0}body.fullmap main{flex:none;padding:0;position:re
     <h1>AelySafe, version 0</h1>
     <p>Prototype cliquable de l'application de sécurité personnelle, pensé pour le pilote à Toulouse. Identité, objet connecté et modération sont simulés. La carte, l'enregistrement audio et les alertes entre téléphones fonctionnent en vrai ; les enregistrements restent sur le téléphone.</p>
     <ul>
-      <li>Inscription réservée aux majeurs, avec pièce d'identité et selfie en direct</li>
-      <li>Ouvert aux femmes et aux hommes majeurs ; comptes refusés ou bannis pour les auteurs d'agressions</li>
-      <li>Signalement d'un utilisateur, suspension immédiate puis bannissement définitif lié à l'identité</li>
+      <li>Inscription dès 18 ans, avec pièce d'identité et selfie en direct</li>
+      <li>Ouvert à toute personne de 18 ans et plus ; comptes refusés ou bannis en cas d'agression</li>
+      <li>Signalement d'un membre, suspension immédiate puis bannissement définitif lié à l'identité</li>
       <li>Alerte en un appui sur SOS ou sur le bracelet, avec enregistrement audio automatique</li>
-      <li>Quand un aidant accepte, la personne reçoit une vibration et une notification</li>
+      <li>Quand quelqu'un accepte d'aider, la personne en danger reçoit une vibration et une notification</li>
       <li>Vraie carte de Toulouse (OpenStreetMap) : lieux de sûreté, métro et tram, zones signalées, itinéraire à pied</li>
-      <li>Mode aidant avec charte d'intervention non violente</li>
+      <li>Mode entraide avec charte d'intervention non violente</li>
       <li>Signalements anonymes, séparés des données personnelles</li>
     </ul>
     <p class="note">Démonstration : inscrivez-vous avec le nom de famille <b>Test-Banni</b> pour voir un compte refusé. Les lieux partenaires affichés sont des exemples, pas de vrais partenaires.</p>
@@ -180,7 +180,7 @@ const PLACES=[
 const SPOTS=[{n:'Capitole',x:170,y:222,ll:[1.4440,43.6045],w:2},{n:'Jean-Jaurès',x:222,y:205,ll:[1.4490,43.6058],w:3},{n:'Matabiau',x:270,y:132,ll:[1.4536,43.6110],w:3},{n:'Esquirol',x:160,y:268,ll:[1.4436,43.6002],w:2},{n:'Carmes',x:168,y:330,ll:[1.4456,43.5977],w:1},{n:'Saint-Cyprien',x:78,y:288,ll:[1.4318,43.5980],w:2},{n:'Compans',x:150,y:140,ll:[1.4350,43.6100],w:1},{n:'François-Verdier',x:252,y:248,ll:[1.4532,43.6003],w:1},{n:'Saint-Michel',x:178,y:400,ll:[1.4470,43.5862],w:1}];
 const TYPES={all:'Tous',commerce:'Commerces',pharma:'Pharmacies',resto:'Bars et restos',transport:'Transports'};
 const TCOL={commerce:'#8e8cf0',pharma:'#16a06a',resto:'#eb693e',transport:'#2a7fb8'};
-const REPORT_TYPES=['Harcèlement de rue','Sentiment d\'être suivi·e','Agression verbale','Comportement menaçant','Autre'];
+const REPORT_TYPES=['Harcèlement de rue','Quelqu\'un me suit','Agression verbale','Comportement menaçant','Autre'];
 const CONTEXTS=['Rue','Bus','Métro','Tram','Gare / station','Parking'];
 
 /* ---------- état ---------- */
@@ -236,12 +236,12 @@ function onb(){
   const back=st>0?`<button class="btn ghost sm" data-act="back">Retour</button>`:'';
   let h='';
   if(st===0)h=`<div class="hero"><img src="assets/logo.png" alt="Logo AelySafe" width="130" height="177" style="display:block;margin:0 auto">
-    <h1 style="margin-top:14px">AelySafe</h1><p class="mute" style="font-size:16px">Comme les loutres qui se tiennent la patte pour ne pas dériver, on ne vous laisse pas seul·e dehors.</p></div>
+    <h1 style="margin-top:14px">AelySafe</h1><p style="font:400 22px/1.2 Antipasto,Satoshi,sans-serif;text-transform:uppercase;color:var(--link);margin:12px 0 6px">Ensemble, on ne dérive pas.</p><p class="mute" style="font-size:16px">Comme les loutres qui se tiennent la patte pour ne pas dériver, AelySafe relie chaque personne à un réseau d'entraide, dans la rue comme dans les transports.</p></div>
     <div class="card"><div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>1</b></span><div>Un appui sur votre bracelet ou votre montre déclenche l'alerte.</div></div>
-    <div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>2</b></span><div>Vos proches et les aidants vérifiés autour de vous reçoivent votre position en temps réel.</div></div>
+    <div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>2</b></span><div>Vos proches et les personnes vérifiées à proximité reçoivent votre position en temps réel.</div></div>
     <div class="li"><span class="pin" aria-hidden="true"><svg width="30" height="40" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 32 12 32s12-11.7 12-20.4C24 5.2 18.6 0 12 0Z" fill="#b22267"/></svg><b>3</b></span><div>Les lieux de sûreté partenaires vous accueillent sur votre trajet.</div></div></div>
-    <button class="btn" data-act="next">Créer mon compte</button><p class="mute" style="text-align:center">Pour les femmes et les hommes majeurs. Identité vérifiée pour tout le monde.</p>`;
-  if(st===1)h=`<h2>Qui êtes-vous ?</h2><p class="mute">Ces informations restent privées. Les autres utilisateurs ne voient que votre prénom.</p>
+    <button class="btn" data-act="next">Créer mon compte</button><p class="mute" style="text-align:center">Dès 18 ans, pour toute personne qui ne se sent pas en sécurité dehors. Chaque profil est vérifié.</p>`;
+  if(st===1)h=`<h2>Qui êtes-vous ?</h2><p class="mute">Ces informations restent privées. Les autres membres ne voient que votre prénom.</p>
     <label class="f" for="fn">Prénom</label><input type="text" id="fn" autocomplete="given-name" value="${esc(S.user.fn)}">
     <label class="f" for="ln">Nom</label><input type="text" id="ln" autocomplete="family-name" value="${esc(S.user.ln)}">
     <label class="f" for="dob">Date de naissance</label><input type="date" id="dob" value="${esc(S.user.dob)}">
@@ -289,7 +289,7 @@ function validate(){
 const devName=()=>({watch:'Montre connectée',band:'Bracelet AelySafe',key:'Porte-clés AelySafe'}[S.device]||'Aucun objet');
 function home(){
   if(T.alert)return alertView();
-  const trip=T.trip?`<div class="card" style="background:var(--lvs);border-color:transparent"><div class="row"><div class="g"><h3>Trajet en cours</h3><small>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)} · suivi par ${S.contacts.length} proche${S.contacts.length>1?'s':''}</small></div><button class="btn lv sm" data-act="arrived">Je suis arrivé·e</button></div></div>`:'';
+  const trip=T.trip?`<div class="card" style="background:var(--lvs);border-color:transparent"><div class="row"><div class="g"><h3>Trajet en cours</h3><small>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)} · suivi par ${S.contacts.length} proche${S.contacts.length>1?'s':''}</small></div><button class="btn lv sm" data-act="arrived">Je suis à destination</button></div></div>`:'';
   return `<h1>Bonjour ${esc(S.user.fn)}</h1><p class="mute">Un appui sur le bouton lance l'alerte immédiatement et enregistre le son autour de vous.</p>
   ${trip}
   <div class="sos" id="sos"><div class="halo"></div><button id="sosb" data-act="sos" aria-label="Lancer une alerte">SOS<span>Appuyer</span></button></div>
@@ -304,9 +304,9 @@ function alertView(){
   return `<div class="alert"><div class="traine" aria-hidden="true"><svg width="120" height="72" viewBox="0 0 200 120"><path d="M200 0 C150 30 110 70 90 120 L200 120 Z" fill="#b7f6ff"/><path d="M200 30 C160 55 135 85 125 120 L200 120 Z" fill="#ed93bb"/><path d="M200 62 C175 78 162 98 158 120 L200 120 Z" fill="#fff9f2"/></svg></div><div class="row"><span class="pill" style="background:#fff3;color:#fff"><span class="dot live"></span>${a.silent?'Alerte silencieuse':'Alerte en cours'}</span><span class="sp g"></span><span class="big" id="clock">${mm}:${ss}</span></div>
   <p style="margin-top:10px">Votre position est partagée en temps réel près de <b>${esc(a.spot)}</b>.</p>
   <p class="recl">${a.rec.state==='on'?'<span class="recdot live"></span>Enregistrement audio en cours':a.rec.state==='off'?esc(a.rec.why):'Activation du micro…'}</p>
-  <div class="row" style="margin-top:6px"><span class="pill" style="background:#fff2;color:#fff">${S.contacts.length} proche${S.contacts.length>1?'s':''} prévenu${S.contacts.length>1?'s':''}</span><span class="pill" style="background:#fff2;color:#fff">${a.helpers.length} aidants vérifiés à proximité</span></div></div>
+  <div class="row" style="margin-top:6px"><span class="pill" style="background:#fff2;color:#fff">Alerte envoyée à ${S.contacts.length} proche${S.contacts.length>1?'s':''}</span><span class="pill" style="background:#fff2;color:#fff">${a.helpers.length} personnes vérifiées à proximité</span></div></div>
   <div class="card" ${a.coming.length?'style="background:#b7f6ff;border-color:#b7f6ff;color:#2b1d1a"':''}><h3>Aide en route</h3>${a.coming.length?a.coming.map(n=>`<div class="li"><div class="ic" style="background:var(--ok)">${esc(n[0]||'?')}</div><div class="g"><b>${esc(n)}</b> a accepté votre appel et arrive</div></div>`).join(''):
-   `<p class="mute">Les aidants vérifiés autour de vous sont prévenus. Une vibration et une notification vous avertiront dès que l'un d'eux accepte.</p><button class="btn ghost" data-act="fakeacc">Simuler : un aidant accepte (démo sur un seul téléphone)</button>`}</div>
+   `<p class="mute">Les personnes vérifiées autour de vous ont reçu votre alerte. Une vibration et une notification vous avertiront dès que l'une d'elles accepte de vous aider.</p><button class="btn ghost" data-act="fakeacc">Simuler : quelqu'un accepte d'aider (démo sur un seul téléphone)</button>`}</div>
   ${mapOK?`<div class="map ml sm" id="mslot"></div>`:`<div class="map" style="aspect-ratio:4/4">${mapSVG({me:a.me,helpers:a.helpers})}</div>`}
   <div class="card"><h3>Lieux de sûreté les plus proches</h3>${mapOK?nearReal(a.ll):near.map(p=>`<div class="li"><div class="ic" style="background:${TCOL[p.t]}">✓</div><div class="g">${esc(p.n)}<br><small>Ouvert ${esc(p.h)}</small></div><b style="white-space:nowrap">${p.d} m</b></div>`).join('')}</div>
   <div class="card"><h3>Je suis en sécurité</h3><label class="f" for="cpin">Code d'annulation</label><input type="password" id="cpin" inputmode="numeric" maxlength="4" style="font:800 22px Satoshi;letter-spacing:.4em">
@@ -321,7 +321,7 @@ function mapViewSVG(){
   <div class="map">${mapSVG(T.trip?{route:[T.trip.a,T.trip.b]}:{})}</div>
   ${sel?`<div class="card"><div class="row"><div class="ic" style="background:${TCOL[sel.t]}">✓</div><div class="g"><h3>${esc(sel.n)}</h3><small>${TYPES[sel.t]} · ouvert ${esc(sel.h)}</small></div></div><p class="mute">Le personnel est formé pour accueillir une personne qui se sent en danger et l'aider à appeler les secours.</p></div>`:'<p class="mute">Touchez un repère pour voir le lieu.</p>'}
   <div class="card"><h3>${T.trip?'Trajet partagé':'Partager un trajet'}</h3>
-  ${T.trip?`<p>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)}</p><p class="mute">Vos proches voient votre progression. Sans nouvelles 10 minutes après l'heure prévue, ils sont alertés.</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>`:
+  ${T.trip?`<p>${esc(T.trip.a.n)} → ${esc(T.trip.b.n)}</p><p class="mute">Vos proches voient votre progression. Sans nouvelles 10 minutes après l'heure prévue, ils sont alertés.</p><button class="btn lv" data-act="arrived">Je suis à destination</button>`:
   `<label class="f" for="ta">Départ</label><select id="ta">${opts}</select><label class="f" for="tb">Arrivée</label><select id="tb">${opts.replace('value="4"','value="4" selected')}</select>
   <button class="btn" style="margin-top:12px" data-act="trip">Démarrer et prévenir mes proches</button>`}</div>
   <p class="mute">Carte simplifiée hors ligne : la vraie carte s'affiche sur la version en ligne (GitHub Pages).</p>`;
@@ -335,7 +335,7 @@ function helpView(){
    ${T.going?`<h3 style="margin-top:12px">Vous êtes en route</h3>${inc.real?'<p class="mute">La personne a reçu une vibration et une notification : elle sait que vous arrivez.</p>':''}<ol style="padding-left:20px"><li>Restez visible et parlez calmement, comme à une connaissance.</li><li>N'intervenez jamais physiquement.</li><li>Appelez le 17 si la situation est dangereuse.</li><li>Proposez d'accompagner la personne vers un lieu de sûreté.</li></ol><button class="btn ghost" data-act="helpdone">La personne est en sécurité</button><button class="btn ghost" style="margin-top:8px" data-act="flag">Signaler un comportement suspect</button>`:
    `<label class="chk"><input type="checkbox" id="charte"><span>Je m'engage à intervenir sans violence et à respecter la charte d'entraide. Je reste responsable de mes actes.</span></label>
    <div class="row"><button class="btn g" data-act="go">J'y vais</button><button class="btn ghost g" data-act="decline">Je ne peux pas</button></div>`}</div>`:
-  `<div class="card" style="text-align:center"><img src="assets/logo.png" alt="" width="64" height="87" style="display:block;margin:0 auto 6px"><p class="mute">${S.helper?(ESN?'Connecté au réseau : vous serez prévenu·e par une vibration et une notification si quelqu\'un lance une alerte.':'Aucune alerte autour de vous.'):'Activez la disponibilité pour recevoir les alertes.'}</p>
+  `<div class="card" style="text-align:center"><img src="assets/logo.png" alt="" width="64" height="87" style="display:block;margin:0 auto 6px"><p class="mute">${S.helper?(ESN?'Connexion au réseau active : une vibration et une notification vous préviendront si quelqu\'un lance une alerte près de vous.':'Aucune alerte autour de vous.'):'Activez la disponibilité pour recevoir les alertes.'}</p>
    <button class="btn ghost" data-act="simin" ${S.helper?'':'disabled'}>Simuler une alerte à proximité</button></div>`}
 `;
 }
@@ -344,8 +344,8 @@ function netView(){
   <div class="card"><h3>Proches de confiance</h3><p class="mute">Ils reçoivent vos alertes et suivent vos trajets. Ils doivent installer l'application.</p>
   ${S.contacts.map((c,i)=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div><button class="btn ghost sm" data-act="editc" data-i="${i}">Modifier</button></div>`).join('')||'<p class="mute">Aucun proche pour l\'instant. Ajoutez-en avec le bouton « Ajouter » en haut à droite.</p>'}</div>
   <div class="card"><h3>Une communauté protégée</h3>
-  <div class="li"><div class="ic" style="background:var(--co)">1</div><div><b>Identité vérifiée</b><br><small>Pièce d'identité et selfie en direct pour chaque compte, femme ou homme.</small></div></div>
-  <div class="li"><div class="ic" style="background:var(--co)">2</div><div><b>Signalement</b><br><small>Tout comportement inapproprié d'un aidant ou d'un utilisateur peut être signalé après une alerte.</small></div></div>
+  <div class="li"><div class="ic" style="background:var(--co)">1</div><div><b>Identité vérifiée</b><br><small>Pièce d'identité et selfie en direct pour chaque compte, sans exception.</small></div></div>
+  <div class="li"><div class="ic" style="background:var(--co)">2</div><div><b>Signalement</b><br><small>Tout comportement inapproprié d'une personne de la communauté peut être signalé après une alerte.</small></div></div>
   <div class="li"><div class="ic" style="background:var(--pk)">3</div><div><b>Suspension immédiate</b><br><small>Le compte signalé ne reçoit plus d'alertes pendant la vérification par la modération.</small></div></div>
   <div class="li"><div class="ic" style="background:var(--pk)">4</div><div><b>Bannissement définitif</b><br><small>Lié à la pièce d'identité : impossible de revenir avec un nouveau compte.</small></div></div>
   <p class="note">Piste à valider : un partenariat avec la police pour exclure dès l'inscription les auteurs d'agressions. Ces fichiers ne sont aujourd'hui consultables que par des organismes autorisés par la loi.</p></div>`;
@@ -365,7 +365,7 @@ function dataBody(){
 }
 function meView(){
   return `<h1>Compte</h1>
-  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${esc(S.user.fn[0]||'?')}</div><div class="g"><h3>${esc(S.user.fn)} ${esc(S.user.ln)}</h3><small>${age(S.user.dob)} ans · membre vérifié</small></div><span class="pill ok"><span class="dot"></span>Vérifié</span></div></div>
+  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${esc(S.user.fn[0]||'?')}</div><div class="g"><h3>${esc(S.user.fn)} ${esc(S.user.ln)}</h3><small>${age(S.user.dob)} ans · profil vérifié</small></div><span class="pill ok"><span class="dot"></span>Vérifié</span></div></div>
   <div class="card"><h3>Offre</h3><table><tr><th>Formule</th><th>Contenu</th></tr>
   <tr><td>Gratuite</td><td>Application, alertes, carte, trajets, réseau. Avec une montre connectée déjà possédée.</td></tr>
   <tr><td>Objet AelySafe</td><td>Bracelet ou porte-clés à acheter (prix à définir), pour ceux qui n'ont pas de montre.</td></tr></table>
@@ -418,7 +418,7 @@ function reportModal(){
   <div id="lastrec">${T.lastRec?'<p class="mute">Préparation de votre enregistrement audio…</p>':''}</div><p class="mute">Voulez-vous signaler ce qui s'est passé ? Le signalement est anonyme : ni votre nom ni votre position exacte ne sont transmis.</p>
   <label class="f" for="rt">Type</label><select id="rt">${REPORT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
   <label class="f" for="rc">Où étiez-vous ?</label><select id="rc">${CONTEXTS.map(t=>`<option>${t}</option>`).join('')}</select>
-  <label class="chk"><input type="checkbox" id="ru"><span>Un aidant ou un utilisateur AelySafe a eu un comportement inapproprié. <small>Ce signalement-là n'est pas anonyme : il est transmis à la modération.</small></span></label>
+  <label class="chk"><input type="checkbox" id="ru"><span>Une personne de la communauté AelySafe a eu un comportement inapproprié. <small>Ce signalement-là n'est pas anonyme : il est transmis à la modération.</small></span></label>
   <div class="row" style="margin-top:14px"><button class="btn g" data-act="sendrep">Envoyer anonymement</button><button class="btn ghost g" data-act="skiprep">Passer</button></div></div></div>`;
 }
 
@@ -462,10 +462,10 @@ document.addEventListener('click',e=>{
   if(a==='pick'){T.sel=el.dataset.id;render()}
   if(a==='trip'){const A=SPOTS[$('#ta').value],B=SPOTS[$('#tb').value];if(A===B){toast('Choisissez deux lieux différents');return}T.trip={a:A,b:B};render();toast('Trajet partagé avec vos proches')}
   if(mapAct(a,el)||liveAct(a,el)||permAct(a,el))return;
-  if(a==='arrived'){T.sheet='peek';T.trip=null;render();toast('Bien arrivé·e ! Vos proches sont prévenus.')}
+  if(a==='arrived'){T.sheet='peek';T.trip=null;render();toast('Trajet terminé : vos proches ont reçu la confirmation.')}
   if(a==='simin'){const sp=SPOTS[Math.floor(Math.random()*SPOTS.length)];T.incoming={n:['Léa','Inès','Thomas','Camille','Yanis'][Math.floor(Math.random()*5)],spot:sp.n,d:150+Math.floor(Math.random()*300),ctx:CONTEXTS[Math.floor(Math.random()*CONTEXTS.length)]};T.going=false;render()}
-  if(a==='go'){if(!$('#charte').checked){toast('Acceptez la charte pour continuer');return}T.going=true;if(T.incoming?.real)pub(T.incoming.id,{type:'accept',n:String(S.user.fn||'Un aidant').slice(0,30)});render()}
-  if(a==='decline'){T.incoming=null;render();toast('D\'autres aidants ont été prévenus')}
+  if(a==='go'){if(!$('#charte').checked){toast('Acceptez la charte pour continuer');return}T.going=true;if(T.incoming?.real)pub(T.incoming.id,{type:'accept',n:String(S.user.fn||'Quelqu\'un').slice(0,30)});render()}
+  if(a==='decline'){T.incoming=null;render();toast('D\'autres personnes à proximité ont reçu l\'alerte')}
   if(a==='flag'){T.incoming=null;T.going=false;render();toast('Signalement transmis à la modération');return}
   if(a==='helpdone'){T.incoming=null;T.going=false;render();toast('Merci pour votre aide')}
   if(a==='charte'){T.modalKind='charte';render()}
@@ -618,7 +618,7 @@ function mapView(){
     <button class="btn" style="margin-top:12px" data-act="calc">Calculer l'itinéraire</button>
     ${p?`<p style="margin-top:12px"><b>${esc(p.a.n)}</b> → <b>${esc(p.b.n)}</b></p><p class="mute">${fmt(p)}</p><button class="btn lv" data-act="trip2">Démarrer et prévenir mes proches</button>`:''}`}
   else if(tr){
-    body=`<div class="shead"><h2>Trajet partagé</h2></div><p style="margin:0"><b>${esc(tr.a.n)}</b> → <b>${esc(tr.b.n)}</b></p><p class="mute">${fmt(tr)}</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>${lightLine}`}
+    body=`<div class="shead"><h2>Trajet partagé</h2></div><p style="margin:0"><b>${esc(tr.a.n)}</b> → <b>${esc(tr.b.n)}</b></p><p class="mute">${fmt(tr)}</p><button class="btn lv" data-act="arrived">Je suis à destination</button>${lightLine}`}
   else{
     body=`<button class="search" data-act="sheetplan">${ico('search')}<span>Où allez-vous ?</span></button>
     <div class="chips" style="margin-top:10px">${Object.entries(MF).map(([k,v])=>`<button class="${T.mf===k?'on':''}" data-mf="${k}">${v}</button>`).join('')}</div>${lightLine}`}
@@ -768,7 +768,7 @@ async function fillLastRec(){const el=document.getElementById('lastrec');if(!el)
   const box=document.getElementById('lastrec');if(!box)return;
   if(r)box.innerHTML='<p style="margin:12px 0 4px"><b>Votre enregistrement audio</b></p><p class="mute" style="margin:0">Vous pouvez le réécouter ou le télécharger maintenant. Il reste aussi disponible dans Compte.</p>'+recHTML(r)}
 function askDel(id){T.modalPrev=T.modal;T.delId=id;
-  T.modal=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="dt"><div class="card"><h2 id="dt">Êtes-vous sûr de vouloir supprimer ?</h2>
+  T.modal=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="dt"><div class="card"><h2 id="dt">Voulez-vous vraiment supprimer ?</h2>
   <p>L'enregistrement audio sera effacé définitivement. Il ne pourra plus servir de preuve.</p>
   <label class="f" for="dpin">Entrez votre code PIN pour confirmer</label><input type="password" id="dpin" inputmode="numeric" maxlength="4" autocomplete="off" style="font:700 22px Satoshi;letter-spacing:.4em">
   <p class="err" id="dperr" role="alert"></p>
@@ -793,7 +793,7 @@ function pub(topic,obj){try{return fetch(NTFY+topic,{method:'POST',body:JSON.str
 function sub(topic,fn){try{const es=new EventSource(NTFY+topic+'/sse');es.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.event&&m.event!=='message')return;const o=JSON.parse(m.message);if(o&&typeof o==='object')fn(o)}catch(err){}};return es}catch(e){return null}}
 function netAlert(){const a=T.alert;MYIDS.add(a.id);
   pub(NET,{type:'alert',id:a.id,n:String(S.user.fn||'Quelqu\'un').slice(0,30),ll:a.ll.map(v=>+v.toFixed(4)),spot:a.spot,t:a.t0});
-  if(ESA)ESA.close();ESA=sub(a.id,o=>{if(o.type==='accept'&&T.alert&&T.alert.id===a.id)helperComing(String(o.n||'Un aidant').slice(0,30))})}
+  if(ESA)ESA.close();ESA=sub(a.id,o=>{if(o.type==='accept'&&T.alert&&T.alert.id===a.id)helperComing(String(o.n||'Quelqu\'un').slice(0,30))})}
 function netEnd(){const a=T.alert;if(!a)return;pub(NET,{type:'end',id:a.id});if(ESA)ESA.close();ESA=null}
 function helperComing(n){const a=T.alert;if(!a)return;if(!a.coming.includes(n))a.coming.push(n);
   buzz(a.silent?[150,100,150]:[400,150,400,150,800]);notify('Quelqu\'un vient vous aider',n+' a accepté votre appel à l\'aide et arrive.','aely-help');toast(n+' arrive pour vous aider');render()}
@@ -809,7 +809,7 @@ function onNet(o){if(typeof o.id!=='string'||!/^aelysafe-a-[a-z0-9]{8,20}$/.test
   else if(o.type==='end'&&T.incoming&&T.incoming.id===o.id){T.incoming=null;T.going=false;toast('Alerte levée : la personne est en sécurité');render()}}
 function liveAct(a,el){
   if(a==='notif'){if(!canNotif())return true;Notification.requestPermission().then(()=>{if(S.onb)render();else el.outerHTML=Notification.permission==='granted'?'<span class="pill ok"><span class="dot"></span>Activées</span>':'<p class="err">Notifications refusées.</p>'});return true}
-  if(a==='fakeacc'){el.disabled=true;el.textContent='Un aidant va accepter…';setTimeout(()=>helperComing(['Camille','Léa','Thomas','Inès','Yanis'][Math.floor(Math.random()*5)]),1500);return true}
+  if(a==='fakeacc'){el.disabled=true;el.textContent='Quelqu\'un va accepter…';setTimeout(()=>helperComing(['Camille','Léa','Thomas','Inès','Yanis'][Math.floor(Math.random()*5)]),1500);return true}
   if(a==='askdel'){askDel(el.dataset.id);return true}
   if(a==='nodel'){T.modal=T.modalPrev||null;T.modalPrev=null;T.delId=null;render();return true}
   if(a==='dodel'){const v=($('#dpin')||{}).value;if(v!==S.pin){const e=$('#dperr');if(e)e.textContent='Code PIN incorrect. L\'enregistrement n\'a pas été supprimé.';return true}
@@ -820,7 +820,7 @@ function liveAct(a,el){
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dpin'){e.preventDefault();const b=document.querySelector('[data-act=dodel]');b&&b.click()}if(e.key==='Escape'&&T.delId){const b=document.querySelector('[data-act=nodel]');b&&b.click()}});
 
 function charteBody(){return `<h2>Charte d'entraide</h2>
-  <p>AelySafe met en relation, il n'organise pas d'intervention. L'aidant agit de sa propre initiative et reste responsable de ses actes.</p>
+  <p>AelySafe met en relation, il n'organise pas d'intervention. La personne qui aide agit de sa propre initiative et reste responsable de ses actes.</p>
   <ol style="padding-left:20px;margin:8px 0"><li>Je n'interviens jamais physiquement et je n'utilise aucune violence.</li><li>Je reste visible et je parle calmement, comme à une connaissance.</li>
   <li>J'appelle le 17 ou le 112 si la situation est dangereuse.</li><li>Je propose d'accompagner la personne vers un lieu de sûreté.</li><li>Je respecte la vie privée de la personne aidée.</li></ol>
   <p class="note">Tout manquement peut être signalé et entraîner la suspension, puis le bannissement du compte.</p>`}
@@ -850,7 +850,7 @@ function permsCard(){const m=S.micOk,n=notifState(),on=S.notifOn!==false;
   return `<div class="card"><h3>Autorisations</h3>
   <div class="perm"><div class="ic" style="background:var(--pk)">${ico('mic')}</div><div class="g"><b>Micro</b><br><small>Enregistrer le son pendant une alerte.</small></div>
    ${m?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':'<button class="btn lv sm" data-act="allowmic">Autoriser</button>'}</div>
-  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('bell')}</div><div class="g"><b>Notifications</b><br><small>Savoir qu'un aidant arrive, ou qu'on a besoin de vous.</small></div>
+  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('bell')}</div><div class="g"><b>Notifications</b><br><small>Savoir que quelqu'un arrive pour vous aider, ou qu'on a besoin de vous.</small></div>
    ${n==='unsupported'?'':n==='denied'?'<span class="pill">Bloquées</span>':`<label class="chk" style="padding:0"><input type="checkbox" id="notifsw" ${n==='granted'&&on?'checked':''} aria-label="Recevoir les notifications"></label>`}</div>
   ${n==='unsupported'?'<p class="note">Sur iPhone : ajoutez AelySafe à l\'écran d\'accueil (Partager, puis « Sur l\'écran d\'accueil ») pour recevoir les notifications.</p>':''}
   ${n==='denied'||(!m&&S.micAsked)?'<p class="note">Une autorisation refusée se réactive dans les réglages du téléphone ou du navigateur (icône à gauche de l\'adresse du site).</p>':''}</div>`}
