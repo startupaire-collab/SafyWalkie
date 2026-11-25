@@ -13,8 +13,9 @@ Prototype cliquable de l'application de sécurité personnelle AelySafe (Challen
 - Enregistrement audio automatique pendant toute l'alerte (micro du téléphone) : réécoute et téléchargement dès la fin de l'alerte, puis dans Compte ; suppression seulement après confirmation et code PIN
 - Réseau d'entraide en temps réel entre téléphones : l'aidant reçoit l'alerte (vibration + notification) ; quand il accepte, la personne en danger reçoit une vibration et une notification « Quelqu'un vient vous aider »
 - Installable sur l'écran d'accueil (PWA)
-- Autorisations micro et notifications demandées dès l'ouverture de l'app
-- Objet connecté : appairage depuis le bouton en haut à droite ou depuis Compte
+- Autorisations micro et notifications demandées par le téléphone lui-même (fenêtres du système) dès l'ouverture ; réglages dans Compte
+- Bouton en haut à droite selon l'onglet : Appairer (Accueil), Charte d'entraide (Aider), + Ajouter (Réseau), Mes données (Compte)
+- Proches de confiance : bouton Modifier, retrait seulement depuis la fiche avec double confirmation
 - Carte plein écran façon Plans (Apple) : panneau de recherche en bas, boutons flottants (SOS, calques, lampadaires, me localiser)
 - Lampadaires : bouton pour demander un éclairage renforcé dans un rayon de 200 m pendant 15 min (simulation smart city, points lumineux réels de la Ville de Toulouse ou d'OpenStreetMap)
 - Vraie carte de Toulouse (OpenStreetMap), aux couleurs AelySafe, jour et nuit : lieux de sûreté réels (pharmacies, police, hôpitaux, gares) + partenaires, lignes de métro et tram, carte de chaleur des signalements (simulée), itinéraire à pied avec recherche d'adresse

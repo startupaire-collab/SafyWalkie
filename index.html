@@ -79,7 +79,7 @@ nav.tabs button.on{color:var(--pk)}nav.tabs svg{width:24px;height:24px}
 .map svg{position:absolute;inset:0;width:100%;height:100%}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}.chips button{flex:none;min-height:40px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;font:600 14px Satoshi;cursor:pointer}
 .chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.li:last-child{border:0}
+.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.li>.g{flex:1}.li:last-child{border:0}
 .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font:700 15px Satoshi,system-ui,sans-serif;color:#2b1d1a;background:var(--lv)}
 .ic[style*='--pk'],.ic[style*='--pr'],.ic[style*='#db2777'],.ic[style*='#b22267'],.ic[style*='#16a06a'],.ic[style*='#2a5bd7'],.ic[style*='#e23b3b'],.ic[style*='#2a8fa3']{color:#fff}
 .ic[style*='--ok']{background:#b7f6ff!important;color:#0e3e45}
@@ -265,7 +265,7 @@ function onb(){
     <div class="card"><label class="chk"><input type="checkbox" id="c1" ${S.user.c1?'checked':''}><span>J'accepte la politique de confidentialité et le traitement de mes données personnelles pour le fonctionnement du service (RGPD).</span></label>
     <label class="chk"><input type="checkbox" id="c2" ${S.user.c2?'checked':''}><span>J'accepte la charte d'entraide : si j'aide quelqu'un, j'interviens sans violence, je reste visible et j'appelle les secours si nécessaire.</span></label>
     <label class="chk"><input type="checkbox" id="c3" ${S.user.c3!==false?'checked':''}><span>J'accepte que mes signalements soient conservés de façon anonyme pour améliorer la sécurité des villes. <small>(facultatif, modifiable à tout moment)</small></span></label></div>
-    ${notifCard()}`;
+`;
   if(st===sec+1)h=`<h2>Votre objet connecté</h2><p class="mute">Il déclenche l'alerte d'un geste, sans sortir votre téléphone.</p>
     ${[['watch','J\'ai déjà une montre connectée','Apple Watch, Wear OS, Garmin… L\'application est gratuite.'],['band','Je veux le bracelet AelySafe','Bracelet discret avec puce, appui long pour alerter. Prix à définir.'],['key','Je veux le porte-clés AelySafe','Même fonctionnement, à accrocher à son sac. Prix à définir.']].map(([v,t,d])=>`<label class="opt ${S.device===v?'on':''}"><input type="radio" name="dev" value="${v}" ${S.device===v?'checked':''}><span class="g"><b>${t}</b><br><small>${d}</small></span></label>`).join('')}`;
   const last=st===sec+1;
@@ -337,15 +337,12 @@ function helpView(){
    <div class="row"><button class="btn g" data-act="go">J'y vais</button><button class="btn ghost g" data-act="decline">Je ne peux pas</button></div>`}</div>`:
   `<div class="card" style="text-align:center"><img src="assets/logo.png" alt="" width="64" height="87" style="display:block;margin:0 auto 6px"><p class="mute">${S.helper?(ESN?'Connecté au réseau : vous serez prévenu·e par une vibration et une notification si quelqu\'un lance une alerte.':'Aucune alerte autour de vous.'):'Activez la disponibilité pour recevoir les alertes.'}</p>
    <button class="btn ghost" data-act="simin" ${S.helper?'':'disabled'}>Simuler une alerte à proximité</button></div>`}
-  ${notifCard()}
-  <div class="card"><h3>La charte d'entraide</h3><p>AelySafe met en relation, il n'organise pas d'intervention. L'aidant agit de sa propre initiative, sans violence, et ne remplace pas les forces de l'ordre.</p></div>`;
+`;
 }
 function netView(){
   return `<h1>Votre réseau</h1>
   <div class="card"><h3>Proches de confiance</h3><p class="mute">Ils reçoivent vos alertes et suivent vos trajets. Ils doivent installer l'application.</p>
-  ${S.contacts.map((c,i)=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div><button class="btn ghost sm" data-del="${i}">Retirer</button></div>`).join('')}
-  <label class="f" for="cn">Nom</label><input type="text" id="cn"><label class="f" for="cp">Téléphone</label><input type="tel" id="cp">
-  <button class="btn" style="margin-top:12px" data-act="addc">Ajouter ce proche</button></div>
+  ${S.contacts.map((c,i)=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div><button class="btn ghost sm" data-act="editc" data-i="${i}">Modifier</button></div>`).join('')||'<p class="mute">Aucun proche pour l\'instant. Ajoutez-en avec le bouton « Ajouter » en haut à droite.</p>'}</div>
   <div class="card"><h3>Une communauté protégée</h3>
   <div class="li"><div class="ic" style="background:var(--co)">1</div><div><b>Identité vérifiée</b><br><small>Pièce d'identité et selfie en direct pour chaque compte, femme ou homme.</small></div></div>
   <div class="li"><div class="ic" style="background:var(--co)">2</div><div><b>Signalement</b><br><small>Tout comportement inapproprié d'un aidant ou d'un utilisateur peut être signalé après une alerte.</small></div></div>
@@ -353,14 +350,9 @@ function netView(){
   <div class="li"><div class="ic" style="background:var(--pk)">4</div><div><b>Bannissement définitif</b><br><small>Lié à la pièce d'identité : impossible de revenir avec un nouveau compte.</small></div></div>
   <p class="note">Piste à valider : un partenariat avec la police pour exclure dès l'inscription les auteurs d'agressions. Ces fichiers ne sont aujourd'hui consultables que par des organismes autorisés par la loi.</p></div>`;
 }
-function meView(){
+function dataBody(){
   const r=S.reports;const by=CONTEXTS.map(c=>({c,n:r.filter(x=>x.ctx===c).length})).filter(x=>x.n);const mx=Math.max(1,...by.map(x=>x.n));
-  return `<h1>Compte</h1>
-  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${esc(S.user.fn[0]||'?')}</div><div class="g"><h3>${esc(S.user.fn)} ${esc(S.user.ln)}</h3><small>${age(S.user.dob)} ans · membre vérifié</small></div><span class="pill ok"><span class="dot"></span>Vérifié</span></div></div>
-  <div class="card"><h3>Offre</h3><table><tr><th>Formule</th><th>Contenu</th></tr>
-  <tr><td>Gratuite</td><td>Application, alertes, carte, trajets, réseau. Avec une montre connectée déjà possédée.</td></tr>
-  <tr><td>Objet AelySafe</td><td>Bracelet ou porte-clés à acheter (prix à définir), pour ceux qui n'ont pas de montre.</td></tr></table>
-  <p style="margin-top:8px">Votre équipement : <b>${devName()}</b></p></div>
+  return `<h2>Mes données</h2>
   <div class="card"><h3>Données personnelles et données de signalement</h3>
   <table><tr><th>Données personnelles</th><th>Données de signalement</th></tr>
   <tr><td>Nom, téléphone, date de naissance, statut de vérification, proches</td><td>Type d'incident, zone d'environ 500 m, tranche horaire, contexte (rue, bus, métro)</td></tr>
@@ -369,11 +361,18 @@ function meView(){
   <tr><td>Supprimables à tout moment</td><td>Conservées seulement si vous avez accepté</td></tr></table>
   <label class="chk"><input type="checkbox" id="c3b" ${S.user.c3?'checked':''}><span>Partager mes signalements de façon anonyme</span></label></div>
   <div class="card"><h3>Mes signalements anonymes</h3>${r.length?by.map(x=>`<div style="margin:8px 0"><div class="row"><span class="g">${x.c}</span><b>${x.n}</b></div><div class="bar"><i style="width:${x.n/mx*100}%"></i></div></div>`).join('')+
-   `<table style="margin-top:8px"><tr><th>Ce qui est transmis</th></tr>${r.slice(-3).reverse().map(x=>`<tr><td>${esc(x.type)} · ${esc(x.ctx)} · zone ${esc(x.zone)} · ${esc(x.slot)}</td></tr>`).join('')}</table>`:'<p class="mute">Aucun signalement pour l\'instant.</p>'}</div>
+   `<table style="margin-top:8px"><tr><th>Ce qui est transmis</th></tr>${r.slice(-3).reverse().map(x=>`<tr><td>${esc(x.type)} · ${esc(x.ctx)} · zone ${esc(x.zone)} · ${esc(x.slot)}</td></tr>`).join('')}</table>`:'<p class="mute">Aucun signalement pour l\'instant.</p>'}</div>`;
+}
+function meView(){
+  return `<h1>Compte</h1>
+  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${esc(S.user.fn[0]||'?')}</div><div class="g"><h3>${esc(S.user.fn)} ${esc(S.user.ln)}</h3><small>${age(S.user.dob)} ans · membre vérifié</small></div><span class="pill ok"><span class="dot"></span>Vérifié</span></div></div>
+  <div class="card"><h3>Offre</h3><table><tr><th>Formule</th><th>Contenu</th></tr>
+  <tr><td>Gratuite</td><td>Application, alertes, carte, trajets, réseau. Avec une montre connectée déjà possédée.</td></tr>
+  <tr><td>Objet AelySafe</td><td>Bracelet ou porte-clés à acheter (prix à définir), pour ceux qui n'ont pas de montre.</td></tr></table>
+  <p style="margin-top:8px">Votre équipement : <b>${devName()}</b></p></div>
   <div class="card">${deviceBody(false)}</div>
-  ${micCard()}
+  ${permsCard()}
   <div class="card"><h3>Enregistrements audio des alertes</h3><p class="mute">Chaque alerte enregistre automatiquement le son autour de vous, comme preuve. V0 : conservés uniquement sur ce téléphone. En production : envoyés chiffrés au fil de l'eau, pour qu'ils ne soient pas perdus si le téléphone est pris.</p><div id="reclist"><p class="mute">Chargement…</p></div></div>
-  ${notifCard()}
   <button class="btn ghost" data-act="reset">Supprimer mon compte et mes données</button>
   <p class="mute" style="text-align:center;margin-top:14px">AelySafe V0 · prototype · startupaire@gmail.com</p>`;
 }
@@ -391,10 +390,10 @@ function render(){
   const views={home,map:mapView,help:helpView,net:netView,me:meView};
   const tabs=[['home','Accueil'],['map','Carte'],['help','Aider'],['net','Réseau'],['me','Compte']];
   app.innerHTML=`<div class="top"><img src="assets/logo.png" alt="" width="24" height="33" style="display:block"><span class="n" style="color:var(--link);font-size:22px;letter-spacing:.06em">AelySafe</span><span class="sp"></span>
-  ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.paired?`<button class="pill ok pillbtn" data-act="device" aria-label="Gérer mon objet connecté"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'} appairé${S.device==='watch'?'e':''}</button>`:'<button class="pill pillbtn" data-act="device" aria-label="Appairer un objet connecté">Appairer</button>'}</div>
+  ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.tab==='help'?'<button class="pill pillbtn" data-act="charte">Charte d\'entraide</button>':S.tab==='net'?'<button class="pill pillbtn" data-act="addc2">+ Ajouter</button>':S.tab==='me'?'<button class="pill pillbtn" data-act="mydata">Mes données</button>':S.paired?`<button class="pill ok pillbtn" data-act="device" aria-label="Gérer mon objet connecté"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'} appairé${S.device==='watch'?'e':''}</button>`:'<button class="pill pillbtn" data-act="device" aria-label="Appairer un objet connecté">Appairer</button>'}</div>
   <main>${views[S.tab]()}</main>
   <nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}</nav>
-  ${T.modalKind==='device'?modalWrap(deviceBody(true)):T.modalKind==='perms'?permsModal():T.modal||''}`;
+  ${T.modalKind==='device'?modalWrap(deviceBody(true)):T.modalKind==='charte'?modalWrap(charteBody()):T.modalKind==='data'?modalWrap(dataBody()):T.modalKind==='contact'?contactModal():T.modal||''}`;
   document.body.classList.toggle('fullmap',S.tab==='map'&&mapOK!==false&&!T.alert);
   fitMain();
   afterRender();
@@ -434,19 +433,20 @@ app.addEventListener('change',e=>{
     if(T.idFile&&T.selfie&&T.verif==='idle'){T.verif='run';setTimeout(()=>{T.verif='ok';S.user.verified=true;save();if(!S.onb&&S.step===2)render()},1800)}
     render()}
   if(t.id==='helper'){S.helper=t.checked;if(!S.helper)T.incoming=null;save();helperNet();render()}
+  if(t.id==='notifsw'){if(t.checked){S.notifOn=true;save();if(canNotif()&&Notification.permission==='default')Notification.requestPermission().then(()=>{render();toast(Notification.permission==='granted'?'Notifications activées':'Notifications refusées par le téléphone')});else{render();toast('Notifications activées')}}
+    else{S.notifOn=false;save();render();toast('Notifications désactivées pour AelySafe')}return}
   if(t.id==='c3b'){S.user.c3=t.checked;save();toast(t.checked?'Partage anonyme activé':'Partage anonyme désactivé')}
 });
 document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-act],[data-tab],[data-filter],[data-mf],[data-del],[data-copy]');if(!el||el.disabled)return;
-  if(el.dataset.tab){S.tab=el.dataset.tab;T.err='';save();render();window.scrollTo(0,0);return}
+  const el=e.target.closest('[data-act],[data-tab],[data-filter],[data-mf],[data-copy]');if(!el||el.disabled)return;
+  if(el.dataset.tab){T.modalKind=null;S.tab=el.dataset.tab;T.err='';save();render();window.scrollTo(0,0);return}
   if(el.dataset.filter){T.filter=el.dataset.filter;render();return}
   if(el.dataset.mf){T.mf=el.dataset.mf;render();return}
-  if(el.dataset.del){S.contacts.splice(+el.dataset.del,1);save();render();return}
   if(el.dataset.copy){navigator.clipboard?.writeText(el.dataset.copy).then(()=>toast('Code copié'),()=>toast('Copie impossible, notez le code'));return}
   const a=el.dataset.act;
   if(a==='next'){if(S.step===0||validate()){if(S.step===2&&/^test-banni$/i.test(S.user.ln||'')){S.banned=true;save();render();return}S.step++;T.err=''}save();render();window.scrollTo(0,0)}
   if(a==='back'){S.step=Math.max(0,S.step-1);T.err='';render()}
-  if(a==='finish'){if(validate()){S.onb=true;S.tab='home';save();helperNet();initMap();setTimeout(checkPerms,800);toast('Bienvenue dans le réseau AelySafe')}render()}
+  if(a==='finish'){if(validate()){S.onb=true;S.tab='home';save();helperNet();initMap();nativeAsk();toast('Bienvenue dans le réseau AelySafe')}render()}
   if(a==='pair'){el.disabled=true;el.textContent='Recherche de l\'objet…';setTimeout(()=>{S.paired=true;save();render();toast(devName()+' connecté')},1200)}
   if(a==='unpair'){S.paired=false;save();render();toast('Objet dissocié')}
   if(a==='device'){T.modalKind='device';render()}
@@ -468,7 +468,14 @@ document.addEventListener('click',e=>{
   if(a==='decline'){T.incoming=null;render();toast('D\'autres aidants ont été prévenus')}
   if(a==='flag'){T.incoming=null;T.going=false;render();toast('Signalement transmis à la modération');return}
   if(a==='helpdone'){T.incoming=null;T.going=false;render();toast('Merci pour votre aide')}
-  if(a==='addc'){const n=$('#cn').value.trim(),p=$('#cp').value.trim();if(!n||!p){toast('Nom et téléphone requis');return}S.contacts.push({n,p});save();render()}
+  if(a==='charte'){T.modalKind='charte';render()}
+  if(a==='mydata'){T.modalKind='data';render()}
+  if(a==='addc2'){T.editC=-1;T.delArm=false;T.modalKind='contact';render();const f=$('#cn');f&&f.focus()}
+  if(a==='editc'){T.editC=+el.dataset.i;T.delArm=false;T.modalKind='contact';render()}
+  if(a==='savec'){const n=$('#cn').value.trim(),p=$('#cp').value.trim(),er=$('#cerr');if(!n||!p){if(er)er.textContent='Le nom et le téléphone sont nécessaires.';return}
+    if(T.editC>=0&&S.contacts[T.editC])S.contacts[T.editC]={n,p};else S.contacts.push({n,p});const isNew=T.editC<0;T.modalKind=null;save();render();toast(isNew?'Proche ajouté':'Proche modifié')}
+  if(a==='delc'){if(!T.delArm){T.delArm=true;el.textContent='Confirmer : retirer ce proche';el.classList.remove('ghost');el.classList.add('pk');return}
+    const c=S.contacts[T.editC];S.contacts.splice(T.editC,1);T.modalKind=null;T.delArm=false;save();render();toast((c?c.n:'Proche')+' retiré de vos proches')}
   if(a==='reset'){T.modal=`<div class="modal"><div class="card"><h2>Tout supprimer ?</h2><p class="mute">Votre compte, vos proches et vos codes seront effacés de cet appareil. Une empreinte chiffrée de votre pièce est gardée seulement en cas de bannissement. Les signalements déjà transmis restent anonymes et ne peuvent pas être reliés à vous.</p><div class="row" style="margin-top:12px"><button class="btn pk g" data-act="doreset">Supprimer</button><button class="btn ghost g" data-act="skiprep">Annuler</button></div></div></div>`;render()}
   if(a==='doreset'){S=fresh();T={...T,modal:null,alert:null,trip:null,verif:'idle',idFile:null,selfie:null,incoming:null};save();render()}
 });
@@ -770,10 +777,8 @@ function askDel(id){T.modalPrev=T.modal;T.delId=id;
 
 /* ---------- notifications et vibration ---------- */
 const canNotif=()=>'Notification' in window;
-function notifCard(){if(!canNotif())return '<div class="card"><h3>Notifications</h3><p class="mute">Ce navigateur ne gère pas les notifications. Sur iPhone : ajoutez AelySafe à l\'écran d\'accueil (Partager, puis « Sur l\'écran d\'accueil »), puis ouvrez-la depuis l\'icône.</p></div>';
-  const p=Notification.permission;return `<div class="card"><h3>Notifications</h3><p class="mute">Pour être prévenu·e quand un aidant arrive, ou quand quelqu'un a besoin d'aide près de vous.</p>
-  ${p==='granted'?'<span class="pill ok"><span class="dot"></span>Activées</span>':p==='denied'?'<p class="err">Bloquées : autorisez-les dans les réglages du navigateur.</p>':'<button class="btn lv" data-act="notif">Autoriser les notifications</button>'}</div>`}
-async function notify(title,body,tag){try{if(!canNotif()||Notification.permission!=='granted')return false;
+function notifState(){if(!canNotif())return 'unsupported';return Notification.permission}
+async function notify(title,body,tag){try{if(!canNotif()||Notification.permission!=='granted'||S.notifOn===false)return false;
   const opt={body,tag,renotify:true,requireInteraction:true,vibrate:[300,150,300,150,600],icon:'icon-192.png',badge:'icon-192.png'};
   const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(reg){await reg.showNotification(title,opt);return true}
   new Notification(title,opt);return true}catch(e){return false}}
@@ -813,6 +818,19 @@ function liveAct(a,el){
     if(myLL&&inArea(myLL)){T.pickd.from={n:'Ma position',ll:myLL};T.form.from='Ma position'}T.plan=null;S.tab='map';render();window.scrollTo(0,0);if(T.pickd.from)mapAct('calc');return true}
   return false}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dpin'){e.preventDefault();const b=document.querySelector('[data-act=dodel]');b&&b.click()}if(e.key==='Escape'&&T.delId){const b=document.querySelector('[data-act=nodel]');b&&b.click()}});
+
+function charteBody(){return `<h2>Charte d'entraide</h2>
+  <p>AelySafe met en relation, il n'organise pas d'intervention. L'aidant agit de sa propre initiative et reste responsable de ses actes.</p>
+  <ol style="padding-left:20px;margin:8px 0"><li>Je n'interviens jamais physiquement et je n'utilise aucune violence.</li><li>Je reste visible et je parle calmement, comme à une connaissance.</li>
+  <li>J'appelle le 17 ou le 112 si la situation est dangereuse.</li><li>Je propose d'accompagner la personne vers un lieu de sûreté.</li><li>Je respecte la vie privée de la personne aidée.</li></ol>
+  <p class="note">Tout manquement peut être signalé et entraîner la suspension, puis le bannissement du compte.</p>`}
+function contactModal(){const c=T.editC>=0?S.contacts[T.editC]:null;
+  return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="ct"><div class="card"><h2 id="ct">${c?'Modifier ce proche':'Ajouter un proche'}</h2>
+  <label class="f" for="cn">Nom</label><input type="text" id="cn" autocomplete="name" value="${esc(c?c.n:'')}">
+  <label class="f" for="cp">Téléphone</label><input type="tel" id="cp" autocomplete="tel" value="${esc(c?c.p:'')}">
+  <p class="err" id="cerr" role="alert"></p>
+  <div class="row"><button class="btn g" data-act="savec">Enregistrer</button><button class="btn ghost g" data-act="closemodal">Annuler</button></div>
+  ${c?'<button class="btn ghost" style="margin-top:14px" data-act="delc">Retirer ce proche</button>':''}</div></div>`}
 /* ---------- objet connecté ---------- */
 function modalWrap(inner){return `<div class="modal" role="dialog" aria-modal="true"><div class="card">${inner}<button class="btn ghost" style="margin-top:10px" data-act="closemodal">Fermer</button></div></div>`}
 function deviceBody(inModal){const dn={watch:['Montre connectée','Apple Watch, Wear OS, Garmin…'],band:['Bracelet AelySafe','Appui long pour alerter'],key:['Porte-clés AelySafe','À accrocher à son sac']};
@@ -828,27 +846,28 @@ async function permState(){let mic='prompt';try{mic=(await navigator.permissions
   return{mic,notif:canNotif()?Notification.permission:'unsupported'}}
 function requestMic(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return Promise.resolve(false);
   return navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{st.getTracks().forEach(t=>t.stop());S.micOk=true;save();return true},()=>{S.micOk=false;save();return false})}
-function permsModal(){const p=T.perm||{},st=v=>v==='granted'?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':v==='denied'?'<span class="pill" style="background:var(--soft)">Bloqué</span>':'';
-  return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="pmt"><div class="card"><h2 id="pmt">Deux autorisations pour vous protéger</h2>
-  <p class="mute">AelySafe ne les utilise que pendant une alerte ou pour l'entraide.</p>
-  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('mic')}</div><div class="g"><b>Micro</b><br><small>Enregistrer le son pendant une alerte, comme preuve.</small></div>${st(p.mic)}</div>
-  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('bell')}</div><div class="g"><b>Notifications</b><br><small>Savoir qu'un aidant arrive, ou qu'on a besoin de vous.</small></div>${st(p.notif)}</div>
-  ${p.mic==='denied'||p.notif==='denied'?'<p class="note">Une autorisation bloquée se réactive dans les réglages du navigateur (icône à gauche de l\'adresse du site).</p>':''}
-  <div class="row" style="margin-top:12px"><button class="btn g" data-act="allowall">Tout autoriser</button><button class="btn ghost g" data-act="permlater">Plus tard</button></div></div></div>`}
-function micCard(){return `<div class="card"><h3>Micro</h3><p class="mute">Pour enregistrer automatiquement le son pendant une alerte.</p>${S.micOk?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':'<button class="btn lv" data-act="allowmic">Autoriser le micro</button>'}</div>`}
-async function checkPerms(){if(!S.onb||T.alert||T.permLater)return;const p=await permState();T.perm=p;if(p.mic==='granted'&&!S.micOk){S.micOk=true;save()}
-  if((p.mic==='prompt'||p.notif==='default')&&!T.modalKind&&!T.modal){T.modalKind='perms';render()}}
+function permsCard(){const m=S.micOk,n=notifState(),on=S.notifOn!==false;
+  return `<div class="card"><h3>Autorisations</h3>
+  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('mic')}</div><div class="g"><b>Micro</b><br><small>Enregistrer le son pendant une alerte.</small></div>
+   ${m?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':'<button class="btn lv sm" data-act="allowmic">Autoriser</button>'}</div>
+  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('bell')}</div><div class="g"><b>Notifications</b><br><small>Savoir qu'un aidant arrive, ou qu'on a besoin de vous.</small></div>
+   ${n==='unsupported'?'':n==='denied'?'<span class="pill">Bloquées</span>':`<label class="chk" style="padding:0"><input type="checkbox" id="notifsw" ${n==='granted'&&on?'checked':''} aria-label="Recevoir les notifications"></label>`}</div>
+  ${n==='unsupported'?'<p class="note">Sur iPhone : ajoutez AelySafe à l\'écran d\'accueil (Partager, puis « Sur l\'écran d\'accueil ») pour recevoir les notifications.</p>':''}
+  ${n==='denied'||(!m&&S.micAsked)?'<p class="note">Une autorisation refusée se réactive dans les réglages du téléphone ou du navigateur (icône à gauche de l\'adresse du site).</p>':''}</div>`}
+/* le téléphone pose lui-même les questions (fenêtres du système), dès l'ouverture */
+let asking=false;
+async function nativeAsk(){if(!S.onb||asking)return;asking=true;
+  try{if(canNotif()&&Notification.permission==='default'&&S.notifOn!==false)await Notification.requestPermission().catch(()=>{})}catch(e){}
+  try{const p=await permState();if(p.mic==='granted'){if(!S.micOk){S.micOk=true;save()}}else if(p.mic==='prompt'){S.micAsked=true;save();await requestMic()}}catch(e){}
+  asking=false;if(S.tab==='me'&&!T.modal)render()}
+function needAsk(){return S.onb&&((canNotif()&&Notification.permission==='default'&&S.notifOn!==false)||!S.micOk)}
 function permAct(a,el){
-  if(a==='allowall'){el.disabled=true;el.textContent='Autorisation en cours…';
-    const n=canNotif()&&Notification.permission==='default'?Notification.requestPermission().catch(()=>{}):Promise.resolve();
-    n.then(()=>requestMic()).then(async ok=>{T.perm=await permState();T.modalKind=null;render();
-      toast(ok&&(!canNotif()||Notification.permission==='granted')?'Micro et notifications autorisés':ok?'Micro autorisé':'Micro refusé : vous pourrez l\'autoriser dans Compte')});return true}
-  if(a==='allowmic'){requestMic().then(ok=>{render();toast(ok?'Micro autorisé':'Micro refusé ou bloqué par le navigateur')});return true}
-  if(a==='permlater'){T.permLater=true;T.modalKind=null;render();return true}
+  if(a==='allowmic'){S.micAsked=true;requestMic().then(ok=>{render();toast(ok?'Micro autorisé':'Micro refusé ou bloqué par le téléphone')});return true}
   return false}
 
 helperNet();
-setTimeout(checkPerms,600);
+setTimeout(nativeAsk,700);
+addEventListener('pointerdown',function once(){if(needAsk())nativeAsk();removeEventListener('pointerdown',once,true)},true);
 if(S.onb)initMap().then(()=>{if(T.alert||S.tab==='map')render()});
 render();
 }
