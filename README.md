@@ -13,6 +13,10 @@ Prototype cliquable de l'application de sécurité personnelle AelySafe (Challen
 - Enregistrement audio automatique pendant toute l'alerte (micro du téléphone) : réécoute et téléchargement dès la fin de l'alerte, puis dans Compte ; suppression seulement après confirmation et code PIN
 - Réseau d'entraide en temps réel entre téléphones : l'aidant reçoit l'alerte (vibration + notification) ; quand il accepte, la personne en danger reçoit une vibration et une notification « Quelqu'un vient vous aider »
 - Installable sur l'écran d'accueil (PWA)
+- Autorisations micro et notifications demandées dès l'ouverture de l'app
+- Objet connecté : appairage depuis le bouton en haut à droite ou depuis Compte
+- Carte plein écran façon Plans (Apple) : panneau de recherche en bas, boutons flottants (SOS, calques, lampadaires, me localiser)
+- Lampadaires : bouton pour demander un éclairage renforcé dans un rayon de 200 m pendant 15 min (simulation smart city, points lumineux réels de la Ville de Toulouse ou d'OpenStreetMap)
 - Vraie carte de Toulouse (OpenStreetMap), aux couleurs AelySafe, jour et nuit : lieux de sûreté réels (pharmacies, police, hôpitaux, gares) + partenaires, lignes de métro et tram, carte de chaleur des signalements (simulée), itinéraire à pied avec recherche d'adresse
 - Mode aidant : réception d'alerte à proximité, charte d'intervention non violente
 - Proches de confiance
@@ -27,6 +31,7 @@ Tout tourne dans le navigateur (localStorage), aucun serveur. Ouvrir `index.html
 | Affichage | MapLibre GL JS 4.7.1 (copié dans `vendor/`) | gratuit, open source |
 | Fond de carte | OpenFreeMap (`tiles.openfreemap.org`) | gratuit, sans clé ni limite |
 | Lignes et arrêts métro, tram, téléphérique, Linéo, bus | Tisséo via Open Data Toulouse Métropole (jeux `ligne` et `arret_physique`, ODbL) | gratuit |
+| Lampadaires (points lumineux) | Open Data Ville de Toulouse (`points-lumineux`), sinon OpenStreetMap (`highway=street_lamp`) | gratuit |
 | Commissariats de police | Open Data Haute-Garonne (`commissariats-de-police-haute-garonne`) | gratuit |
 | Pharmacies, hôpitaux, gendarmeries, gares (+ secours si Tisséo indisponible) | Overpass API (OpenStreetMap) | gratuit, usage raisonnable |
 | Alertes en temps réel entre téléphones | ntfy.sh (sans compte) | gratuit |

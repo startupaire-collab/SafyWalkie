@@ -101,6 +101,25 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .sug{display:grid;gap:4px;margin-top:4px}.sug button{text-align:left;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;font:15px Satoshi,sans-serif;cursor:pointer}
 .inrow{display:flex;gap:8px}.inrow input{flex:1}
 .recl{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-weight:600;font-size:14px}.recdot{width:10px;height:10px;border-radius:50%;background:#fff;flex:none}
+.pillbtn{border:0;cursor:pointer;font:600 13px Satoshi,sans-serif;min-height:36px}
+body.fullmap{overflow:hidden}body.fullmap .app .top{display:none}
+body.fullmap .app{min-height:0}body.fullmap main{flex:none;padding:0;position:relative;height:calc(100dvh - 65px - env(safe-area-inset-bottom));overflow:hidden}
+.fm{position:absolute;inset:0}.fm .map.ml{position:absolute;inset:0;height:auto;border:0;border-radius:0}
+.fctrl{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:3}
+.fgroup{display:flex;flex-direction:column;background:var(--card);border-radius:14px;box-shadow:0 4px 18px #2b1d1a33;overflow:hidden}
+.fgroup button{width:46px;height:46px;border:0;background:none;color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.fgroup button+button{border-top:1px solid var(--line)}.fgroup button.on{color:var(--pk)}.fgroup button.lit{background:#ffd84d;color:#2b1d1a}
+.fgroup svg,.ficon{width:22px;height:22px}
+.fsos{width:50px;height:50px;border-radius:50%;border:3px solid #fff;background:var(--pk);color:#fff;font:400 16px Antipasto,Satoshi,sans-serif;box-shadow:0 4px 18px #db277766;cursor:pointer}
+.lpanel{position:absolute;top:calc(12px + env(safe-area-inset-top));right:70px;left:12px;max-width:300px;margin-left:auto;background:var(--card);border-radius:18px;box-shadow:0 8px 28px #2b1d1a33;padding:14px;z-index:4;max-height:70%;overflow:auto}
+.lpanel .chips{flex-wrap:wrap}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:3;background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-radius:22px;box-shadow:0 -2px 26px #2b1d1a2e;padding:0 14px 14px;max-height:64%;overflow:auto;overscroll-behavior:contain}
+.grab{display:block;width:100%;height:22px;background:none;border:0;position:relative;cursor:pointer;padding:0}.grab::before{content:"";position:absolute;left:50%;top:8px;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line)}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;border-radius:14px;background:var(--soft);padding:0 14px;color:var(--mute);width:100%;border:0;font:16px Satoshi,sans-serif;text-align:left;cursor:pointer}
+.shead{display:flex;align-items:center;gap:10px;margin:2px 0 6px}.shead h2{flex:1;font-size:22px}
+.xbtn{width:36px;height:36px;border-radius:50%;border:0;background:var(--soft);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.lightnote{display:flex;align-items:center;gap:8px;background:#fff4c2;color:#2b1d1a;border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600;margin-top:10px}
+.perm{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.perm:last-of-type{border:0}
 .hero{text-align:center;padding:24px 4px}.hero svg{width:150px;height:auto}
 </style>
 </head>
@@ -274,9 +293,6 @@ function home(){
   return `<h1>Bonjour ${esc(S.user.fn)}</h1><p class="mute">Un appui sur le bouton lance l'alerte immédiatement et enregistre le son autour de vous.</p>
   ${trip}
   <div class="sos" id="sos"><div class="halo"></div><button id="sosb" data-act="sos" aria-label="Lancer une alerte">SOS<span>Appuyer</span></button></div>
-  <div class="card"><div class="row"><div class="ic" style="background:var(--co)">${S.device==='watch'?'W':S.device==='key'?'K':'B'}</div><div class="g"><h3>${devName()}</h3><small>${S.paired?'Connecté · réponse en moins d\'une seconde':'Non appairé'}</small></div>
-  ${S.paired?'<span class="pill ok"><span class="dot"></span>Actif</span>':'<button class="btn sm" data-act="pair">Appairer</button>'}</div>
-  ${S.paired?`<button class="btn ghost" style="margin-top:12px" data-act="press">Simuler un appui long sur ${S.device==='watch'?'la montre':S.device==='key'?'le porte-clés':'le bracelet'}</button>`:''}</div>
   <div class="row" style="margin-top:4px"><button class="btn ghost g" data-tab="map">Préparer un trajet</button><button class="btn ghost g" data-act="silent">Alerte silencieuse</button></div>
   <div class="card"><h3>Vos proches de confiance</h3>${S.contacts.map(c=>`<div class="li"><div class="ic">${esc(c.n[0]||'?')}</div><div class="g">${esc(c.n)}<br><small>${esc(c.p)}</small></div></div>`).join('')||'<p class="mute">Aucun proche ajouté.</p>'}
   <button class="btn ghost sm" data-tab="net">Gérer</button></div>
@@ -354,6 +370,8 @@ function meView(){
   <label class="chk"><input type="checkbox" id="c3b" ${S.user.c3?'checked':''}><span>Partager mes signalements de façon anonyme</span></label></div>
   <div class="card"><h3>Mes signalements anonymes</h3>${r.length?by.map(x=>`<div style="margin:8px 0"><div class="row"><span class="g">${x.c}</span><b>${x.n}</b></div><div class="bar"><i style="width:${x.n/mx*100}%"></i></div></div>`).join('')+
    `<table style="margin-top:8px"><tr><th>Ce qui est transmis</th></tr>${r.slice(-3).reverse().map(x=>`<tr><td>${esc(x.type)} · ${esc(x.ctx)} · zone ${esc(x.zone)} · ${esc(x.slot)}</td></tr>`).join('')}</table>`:'<p class="mute">Aucun signalement pour l\'instant.</p>'}</div>
+  <div class="card">${deviceBody(false)}</div>
+  ${micCard()}
   <div class="card"><h3>Enregistrements audio des alertes</h3><p class="mute">Chaque alerte enregistre automatiquement le son autour de vous, comme preuve. V0 : conservés uniquement sur ce téléphone. En production : envoyés chiffrés au fil de l'eau, pour qu'ils ne soient pas perdus si le téléphone est pris.</p><div id="reclist"><p class="mute">Chargement…</p></div></div>
   ${notifCard()}
   <button class="btn ghost" data-act="reset">Supprimer mon compte et mes données</button>
@@ -373,10 +391,12 @@ function render(){
   const views={home,map:mapView,help:helpView,net:netView,me:meView};
   const tabs=[['home','Accueil'],['map','Carte'],['help','Aider'],['net','Réseau'],['me','Compte']];
   app.innerHTML=`<div class="top"><img src="assets/logo.png" alt="" width="24" height="33" style="display:block"><span class="n" style="color:var(--link);font-size:22px;letter-spacing:.06em">AelySafe</span><span class="sp"></span>
-  ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.paired?`<span class="pill ok"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'}</span>`:'<span class="pill">Non appairé</span>'}</div>
+  ${T.alert?'<span class="pill" style="background:var(--pk);color:#fff"><span class="dot live"></span>Alerte</span>':S.paired?`<button class="pill ok pillbtn" data-act="device" aria-label="Gérer mon objet connecté"><span class="dot"></span>${S.device==='watch'?'Montre':S.device==='key'?'Porte-clés':'Bracelet'} appairé${S.device==='watch'?'e':''}</button>`:'<button class="pill pillbtn" data-act="device" aria-label="Appairer un objet connecté">Appairer</button>'}</div>
   <main>${views[S.tab]()}</main>
   <nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}" aria-label="${l}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join('')}</nav>
-  ${T.modal||''}`;
+  ${T.modalKind==='device'?modalWrap(deviceBody(true)):T.modalKind==='perms'?permsModal():T.modal||''}`;
+  document.body.classList.toggle('fullmap',S.tab==='map'&&mapOK!==false&&!T.alert);
+  fitMain();
   afterRender();
   if(S.tab==='me')fillRecs();
   if(T.modal&&T.lastRec)fillLastRec();
@@ -407,6 +427,7 @@ function reportModal(){
 app.addEventListener('change',e=>{
   const t=e.target;
   if(t.name==='g'){S.user.g=t.value;app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.contains(document.querySelector('input[name=g]:checked'))))}
+  if(t.name==='dev2'){S.device=t.value;S.paired=false;save();render();return}
   if(t.name==='dev')app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.querySelector('input').checked));
   if(t.dataset.file){const f=t.files&&t.files[0];if(!f)return;
     if(t.dataset.file==='id')T.idFile=f.name;else{try{T.selfie=URL.createObjectURL(f)}catch(err){T.selfie=null}}
@@ -425,9 +446,12 @@ document.addEventListener('click',e=>{
   const a=el.dataset.act;
   if(a==='next'){if(S.step===0||validate()){if(S.step===2&&/^test-banni$/i.test(S.user.ln||'')){S.banned=true;save();render();return}S.step++;T.err=''}save();render();window.scrollTo(0,0)}
   if(a==='back'){S.step=Math.max(0,S.step-1);T.err='';render()}
-  if(a==='finish'){if(validate()){S.onb=true;S.tab='home';save();helperNet();initMap();toast('Bienvenue dans le réseau AelySafe')}render()}
-  if(a==='pair'){toast('Recherche de l\'objet…');setTimeout(()=>{S.paired=true;save();render();toast(devName()+' connecté')},1200)}
-  if(a==='sos'||a==='press')startAlert(false);
+  if(a==='finish'){if(validate()){S.onb=true;S.tab='home';save();helperNet();initMap();setTimeout(checkPerms,800);toast('Bienvenue dans le réseau AelySafe')}render()}
+  if(a==='pair'){el.disabled=true;el.textContent='Recherche de l\'objet…';setTimeout(()=>{S.paired=true;save();render();toast(devName()+' connecté')},1200)}
+  if(a==='unpair'){S.paired=false;save();render();toast('Objet dissocié')}
+  if(a==='device'){T.modalKind='device';render()}
+  if(a==='closemodal'){T.modalKind=null;render()}
+  if(a==='sos'||a==='press'){T.modalKind=null;startAlert(false)}
   if(a==='silent')startAlert(true);
   if(a==='cancel'){const v=$('#cpin').value;if(v!==S.pin){T.err='Code incorrect. L\'alerte continue.';render();return}
     clearInterval(tick);T.lastRec=T.alert.rec.state==='on'?'r'+T.alert.t0:null;stopRec();netEnd();T.alert=null;T.err='';reportModal();render()}
@@ -437,8 +461,8 @@ document.addEventListener('click',e=>{
   if(a==='skiprep'){T.modal=null;T.lastRec=null;T.modalPrev=null;render()}
   if(a==='pick'){T.sel=el.dataset.id;render()}
   if(a==='trip'){const A=SPOTS[$('#ta').value],B=SPOTS[$('#tb').value];if(A===B){toast('Choisissez deux lieux différents');return}T.trip={a:A,b:B};render();toast('Trajet partagé avec vos proches')}
-  if(mapAct(a,el)||liveAct(a,el))return;
-  if(a==='arrived'){T.trip=null;render();toast('Bien arrivé·e ! Vos proches sont prévenus.')}
+  if(mapAct(a,el)||liveAct(a,el)||permAct(a,el))return;
+  if(a==='arrived'){T.sheet='peek';T.trip=null;render();toast('Bien arrivé·e ! Vos proches sont prévenus.')}
   if(a==='simin'){const sp=SPOTS[Math.floor(Math.random()*SPOTS.length)];T.incoming={n:['Léa','Inès','Thomas','Camille','Yanis'][Math.floor(Math.random()*5)],spot:sp.n,d:150+Math.floor(Math.random()*300),ctx:CONTEXTS[Math.floor(Math.random()*CONTEXTS.length)]};T.going=false;render()}
   if(a==='go'){if(!$('#charte').checked){toast('Acceptez la charte pour continuer');return}T.going=true;if(T.incoming?.real)pub(T.incoming.id,{type:'accept',n:String(S.user.fn||'Un aidant').slice(0,30)});render()}
   if(a==='decline'){T.incoming=null;render();toast('D\'autres aidants ont été prévenus')}
@@ -471,8 +495,8 @@ async function boot(){
   let style;try{const r=await get(SRC.style,{},7000);if(!r.ok)return false;style=await r.json()}catch(e){return false}
   const f=(style.layers||[]).map(l=>l.layout&&l.layout['text-font']).find(v=>Array.isArray(v)&&v.every(x=>typeof x==='string'));if(f)FONT=[f.find(x=>/Bold/.test(x))||f[0]];
   host=document.createElement('div');host.className='mlhost';let slot0=document.getElementById('mslot');if(!slot0){slot0=document.createElement('div');slot0.style.cssText='position:fixed;left:-10000px;top:0;width:400px;height:400px';slot0.setAttribute('aria-hidden','true');document.body.appendChild(slot0)}slot0.appendChild(host);
-  try{M=new maplibregl.Map({container:host,style,center:GEO.center,zoom:13.6,minZoom:11,maxBounds:GEO.max,attributionControl:{compact:true}})}catch(e){host.remove();return false}
-  M.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  try{M=new maplibregl.Map({container:host,style,center:GEO.center,zoom:13.6,minZoom:11,maxBounds:GEO.max,attributionControl:false})}catch(e){host.remove();return false}
+  M.addControl(new maplibregl.AttributionControl({compact:true}),'top-left');
   const ok=await Promise.race([new Promise(r=>M.once('load',()=>r(true))),new Promise(r=>setTimeout(()=>r(false),12000))]);
   if(!ok){M.remove();host.remove();M=null;return false}
   const h=new Date().getHours();theme(h>=20||h<7);layers();loadOSM();loadPartners();loadTisseo();loadCD31();return true;
@@ -494,8 +518,10 @@ function heatData(){let z=11;const rnd=()=>(z=z*16807%2147483647)/2147483647,f=[
   return fc(f)}
 function layers(){
   const src=(id,d)=>M.addSource(id,{type:'geojson',data:d||fc([])});
-  src('ae-lines');src('ae-stops');src('ae-places');src('ae-heat',heatData());src('ae-route');src('ae-me');src('ae-helpers');
+  src('ae-zone');src('ae-lines');src('ae-stops');src('ae-places');src('ae-lamps');src('ae-user');src('ae-heat',heatData());src('ae-route');src('ae-me');src('ae-helpers');
   const cap={'line-cap':'round','line-join':'round'};
+  M.addLayer({id:'ae-zone',type:'fill',source:'ae-zone',paint:{'fill-color':'#ffd84d','fill-opacity':.22}});
+  M.addLayer({id:'ae-zone-line',type:'line',source:'ae-zone',paint:{'line-color':'#f2b705','line-width':2,'line-dasharray':[2,2]}});
   M.addLayer({id:'ae-heat',type:'heatmap',source:'ae-heat',layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],11,12,16,42],'heatmap-intensity':.9,'heatmap-opacity':.75,'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(142,140,240,0)',.25,'#8e8cf0',.55,'#eb693e',.85,'#db2777']}});
   const big=['!=',['get','m'],'bus'],W=['match',['get','m'],'metro',5,'tram',4,'cable',4,'lineo',3,1.6];
   M.addLayer({id:'ae-lines-case',type:'line',source:'ae-lines',filter:big,layout:cap,paint:{'line-color':PAL.day.bg,'line-width':['+',W,3],'line-opacity':.9}});
@@ -507,13 +533,17 @@ function layers(){
   M.addLayer({id:'ae-route',type:'line',source:'ae-route',layout:cap,paint:{'line-color':'#8e8cf0','line-width':6}});
   M.addLayer({id:'ae-places',type:'circle',source:'ae-places',paint:{'circle-color':['get','c'],'circle-stroke-color':'#fff','circle-stroke-width':2,
     'circle-radius':['interpolate',['linear'],['zoom'],12,['case',['==',['get','k'],'partner'],7,4],16,['case',['==',['get','k'],'partner'],12,9]]}});
+  M.addLayer({id:'ae-lamps-glow',type:'circle',source:'ae-lamps',paint:{'circle-color':'#ffd84d','circle-radius':['interpolate',['linear'],['zoom'],14,8,18,26],'circle-blur':.9,'circle-opacity':.85}});
+  M.addLayer({id:'ae-lamps',type:'circle',source:'ae-lamps',paint:{'circle-color':'#fff6c4','circle-radius':3.5,'circle-stroke-color':'#f2b705','circle-stroke-width':1.5}});
+  M.addLayer({id:'ae-user-halo',type:'circle',source:'ae-user',paint:{'circle-color':'#2f80ed','circle-opacity':.18,'circle-radius':22}});
+  M.addLayer({id:'ae-user',type:'circle',source:'ae-user',paint:{'circle-color':'#2f80ed','circle-radius':8,'circle-stroke-color':'#fff','circle-stroke-width':3}});
   M.addLayer({id:'ae-helpers',type:'circle',source:'ae-helpers',paint:{'circle-color':'#8e8cf0','circle-radius':8,'circle-stroke-color':'#fff','circle-stroke-width':3}});
   M.addLayer({id:'ae-me-halo',type:'circle',source:'ae-me',paint:{'circle-color':'#db2777','circle-opacity':.18,'circle-radius':30}});
   M.addLayer({id:'ae-me',type:'circle',source:'ae-me',paint:{'circle-color':'#db2777','circle-radius':10,'circle-stroke-color':'#fff','circle-stroke-width':3}});
   const pop=(f,l1,l2)=>{const d=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('div'),sr=document.createElement('div');
     b.textContent=f.properties.n;sm.textContent=l1;sm.style.color='#76646c';sr.textContent=l2;sr.style.cssText='color:#9a8a92;font-size:12px';d.append(b,sm,sr);
     new maplibregl.Popup({closeButton:false,offset:12}).setLngLat(f.geometry.coordinates).setDOMContent(d).addTo(M)};
-  M.on('click','ae-places',e=>{const p=e.features[0].properties;pop(e.features[0],(KIND[p.k]||['Lieu'])[0]+(p.h?' · '+p.h:''),p.src?'Source : '+p.src:'')});
+  M.on('click','ae-places',e=>{const f=e.features[0],p=f.properties;if(T.alert){pop(f,(KIND[p.k]||['Lieu'])[0]+(p.h?' · '+p.h:''),p.src?'Source : '+p.src:'');return}T.selPlace={n:p.n,k:p.k,h:p.h,src:p.src,ll:f.geometry.coordinates.slice()};T.sheet='place';T.layers=false;render()});
   M.on('click','ae-stops',e=>{const p=e.features[0].properties;pop(e.features[0],'Arrêt '+({metro:'de métro',tram:'de tram',cable:'de téléphérique',lineo:'Linéo',bus:'de bus'}[p.m]||''),'Source : Tisséo')});
   M.on('mouseenter','ae-stops',()=>M.getCanvas().style.cursor='pointer');M.on('mouseleave','ae-stops',()=>M.getCanvas().style.cursor='');
   M.on('mouseenter','ae-places',()=>M.getCanvas().style.cursor='pointer');M.on('mouseleave','ae-places',()=>M.getCanvas().style.cursor='');
@@ -546,6 +576,8 @@ function nearReal(ll){const all=(MD.all||allPlaces()).filter(f=>f.properties.k!=
   return all.map(f=>({p:f.properties,d:Math.round(hav(ll,f.geometry.coordinates))})).sort((a,b)=>a.d-b.d).slice(0,3)
    .map(({p,d})=>`<div class="li"><div class="ic" style="background:${p.c}">✓</div><div class="g">${esc(p.n)}<br><small>${esc(KIND[p.k][0])}${p.h?' · '+esc(p.h):''}</small></div><b style="white-space:nowrap">${d} m</b></div>`).join('')}
 function setRoute(geo){if(M)M.getSource('ae-route').setData(geo?fc([{type:'Feature',geometry:geo,properties:{}}]):fc([]))}
+function fitMain(){const mn=document.querySelector('main'),nv=document.querySelector('nav.tabs');if(!mn)return;if(document.body.classList.contains('fullmap')&&nv){mn.style.height=Math.max(300,innerHeight-nv.offsetHeight)+'px'}else mn.style.height=''}
+addEventListener('resize',()=>{fitMain();M&&M.resize()});
 function afterRender(){
   const slot=document.getElementById('mslot');if(!slot)return;
   if(mapOK===null){initMap().then(()=>{if(document.getElementById('mslot')||S.tab==='map'||T.alert)render()});return}
@@ -556,23 +588,70 @@ function afterRender(){
   const a=T.alert;M.getSource('ae-me').setData(a?fc([pt(a.ll,{})]):fc([]));M.getSource('ae-helpers').setData(a?fc(a.hll.map(h=>pt(h,{}))):fc([]));
   if(a&&T.flown!==a.t0+String(a.ll)){T.flown=a.t0+String(a.ll);M.jumpTo({center:a.ll,zoom:15.4})}
   const g=T.trip?.geo||T.plan?.geo||null;setRoute(g);
+  M.getSource('ae-user').setData(myLL&&inArea(myLL)&&!a?fc([pt(myLL,{})]):fc([]));
 }
+const IC={layers:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>',loc:'<path d="M3 11 21 3l-8 18-2-8-8-2Z"/>',bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/>',walk:'<circle cx="13" cy="4" r="2"/><path d="m9 21 3-7 3 3v4M7 12l3-4 4 1 2 3"/>'};
+const ico=(k,c='')=>`<svg class="ficon ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
 function mapView(){
   if(mapOK===false)return mapViewSVG();
-  const p=T.plan,tr=T.trip,fmt=r=>`${(r.dist/1000).toFixed(1).replace('.',',')} km · ${Math.round(r.dur/60)} min à pied · ${r.safe} lieu${r.safe>1?'x':''} de sûreté à moins de 150 m`;
+  const p=T.plan,tr=T.trip,sh=T.sheet||'peek',fmt=r=>`${(r.dist/1000).toFixed(1).replace('.',',')} km · ${Math.round(r.dur/60)} min à pied · ${r.safe} lieu${r.safe>1?'x':''} de sûreté à moins de 150 m`;
   const field=(id,l)=>`<label class="f" for="${id}">${l}</label><div class="inrow"><input type="text" id="${id}" autocomplete="off" placeholder="Adresse, lieu, station…" value="${esc(T.form[id])}">${id==='from'?'<button class="btn ghost sm" data-act="locate">Ma position</button>':''}</div><div class="sug" id="sug-${id}"></div>`;
-  return `<h1>Carte et trajets</h1><p class="mute">Toulouse · fond de carte OpenStreetMap</p>
-  <div class="chips">${Object.entries(MF).map(([k,v])=>`<button class="${T.mf===k?'on':''}" data-mf="${k}">${v}</button>`).join('')}</div>
-  <div class="chips"><button class="${LAY.lines?'on':''}" data-act="tl">Réseau Tisséo</button><button class="${LAY.heat?'on':''}" data-act="th">Zones signalées</button><button data-act="tn">${isNight?'Carte de jour':'Carte de nuit'}</button></div>
+  const lit=LIGHT&&LIGHT.until>Date.now();
+  const lightLine=lit?`<div class="lightnote">${ico('bulb')}<span>Éclairage renforcé autour de vous · encore ${Math.max(1,Math.ceil((LIGHT.until-Date.now())/60000))} min</span></div>`:'';
+  let body='';
+  if(sh==='place'&&T.selPlace){const q=T.selPlace,d=myLL&&inArea(myLL)?Math.round(hav(myLL,q.ll)):null;
+    body=`<div class="shead"><h2>${esc(q.n)}</h2><button class="xbtn" data-act="sheetpeek" aria-label="Fermer">${ico('x')}</button></div>
+    <p class="mute" style="margin:0">${esc((KIND[q.k]||['Lieu'])[0])}${d!=null?' · à '+(d<1000?d+' m':(d/1000).toFixed(1).replace('.',',')+' km'):''}</p>
+    ${q.h?`<p style="margin:6px 0 0"><b>Horaires</b> · ${esc(q.h)}</p>`:''}${q.src?`<p class="mute" style="margin:6px 0 0">Source : ${esc(q.src)}</p>`:''}
+    <button class="btn" style="margin-top:12px" data-act="toplace">${ico('walk')} Itinéraire à pied</button>`}
+  else if(sh==='plan'&&!tr){
+    body=`<div class="shead"><h2>Itinéraire</h2><button class="xbtn" data-act="sheetpeek" aria-label="Fermer">${ico('x')}</button></div>
+    ${field('from','Départ')}${field('to','Arrivée')}
+    <button class="btn" style="margin-top:12px" data-act="calc">Calculer l'itinéraire</button>
+    ${p?`<p style="margin-top:12px"><b>${esc(p.a.n)}</b> → <b>${esc(p.b.n)}</b></p><p class="mute">${fmt(p)}</p><button class="btn lv" data-act="trip2">Démarrer et prévenir mes proches</button>`:''}`}
+  else if(tr){
+    body=`<div class="shead"><h2>Trajet partagé</h2></div><p style="margin:0"><b>${esc(tr.a.n)}</b> → <b>${esc(tr.b.n)}</b></p><p class="mute">${fmt(tr)}</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>${lightLine}`}
+  else{
+    body=`<button class="search" data-act="sheetplan">${ico('search')}<span>Où allez-vous ?</span></button>
+    <div class="chips" style="margin-top:10px">${Object.entries(MF).map(([k,v])=>`<button class="${T.mf===k?'on':''}" data-mf="${k}">${v}</button>`).join('')}</div>${lightLine}`}
+  return `<div class="fm">
   <div class="map ml" id="mslot">${mapOK===null?'<div class="loading">Chargement de la carte…</div>':''}</div>
-  <div class="legend" id="mlegend"></div>
-  ${LAY.heat?'<p class="note">Vue « ville intelligente » : densité des signalements anonymes. Pour la démo, ces données sont simulées.</p>':''}
-  <div class="card"><h3>${tr?'Trajet partagé':'Itinéraire à pied'}</h3>
-  ${tr?`<p><b>${esc(tr.a.n)}</b> → <b>${esc(tr.b.n)}</b></p><p class="mute">${fmt(tr)}</p><p class="mute">Vos proches voient votre progression. Sans nouvelles 10 minutes après l'heure prévue, ils sont alertés.</p><button class="btn lv" data-act="arrived">Je suis arrivé·e</button>`:
-  `${field('from','Départ')}${field('to','Arrivée')}
-   <button class="btn" style="margin-top:12px" data-act="calc">Calculer l'itinéraire</button>
-   ${p?`<p style="margin-top:12px"><b>${esc(p.a.n)}</b> → <b>${esc(p.b.n)}</b></p><p class="mute">${fmt(p)}</p><button class="btn lv" data-act="trip2">Démarrer et prévenir mes proches</button>`:''}`}</div>
-  <p class="mute">Sources : Tisséo, lignes et arrêts (Toulouse Métropole, ODbL) · commissariats (Département de la Haute-Garonne) · pharmacies, hôpitaux, gendarmeries, gares (© contributeurs OpenStreetMap) · fond OpenFreeMap · recherche Photon · itinéraire FOSSGIS.</p>`;
+  <div class="fctrl">
+    <button class="fsos" data-act="sos" aria-label="Lancer une alerte">SOS</button>
+    <div class="fgroup">
+      <button class="${T.layers?'on':''}" data-act="layers" aria-label="Calques et légende" aria-expanded="${!!T.layers}">${ico('layers')}</button>
+      <button class="${lit?'lit':''}" data-act="lights" aria-label="${lit?'Éteindre l\'éclairage renforcé':'Allumer les lampadaires autour de moi'}" aria-pressed="${lit}">${ico('bulb')}</button>
+      <button data-act="locme" aria-label="Me localiser">${ico('loc')}</button>
+    </div>
+  </div>
+  ${T.layers?`<div class="lpanel"><div class="shead"><h3 style="flex:1">Carte</h3><button class="xbtn" data-act="layers" aria-label="Fermer">${ico('x')}</button></div>
+    <div class="chips"><button class="${LAY.lines?'on':''}" data-act="tl">Réseau Tisséo</button><button class="${LAY.heat?'on':''}" data-act="th">Zones signalées</button><button class="${isNight?'on':''}" data-act="tn">Mode nuit</button></div>
+    <div class="legend" id="mlegend"></div>
+    ${LAY.heat?'<p class="note">Vue « ville intelligente » : densité des signalements anonymes. Données simulées pour la démo.</p>':''}
+    <p class="mute" style="font-size:12.5px">Sources : Tisséo (Toulouse Métropole, ODbL) · commissariats (Haute-Garonne) · éclairage public (Ville de Toulouse) · © contributeurs OpenStreetMap · OpenFreeMap · Photon · FOSSGIS.</p></div>`:''}
+  <div class="sheet"><button class="grab" data-act="${sh==='peek'&&!tr?'sheetplan':'sheetpeek'}" aria-label="${sh==='peek'?'Ouvrir':'Réduire'} le panneau"></button>${body}</div>
+  </div>`;
+}
+/* ---------- lampadaires : éclairage renforcé autour de la personne (simulation smart city) ---------- */
+let LIGHT=null,lightT=null;
+const LAMPS_ODS='https://data.toulouse-metropole.fr/api/explore/v2.1/catalog/datasets/points-lumineux/records';
+function getPos(ms=7000){return new Promise(res=>{if(!navigator.geolocation)return res(null);try{navigator.geolocation.getCurrentPosition(p=>res([p.coords.longitude,p.coords.latitude]),()=>res(null),{enableHighAccuracy:true,timeout:ms,maximumAge:30000})}catch(e){res(null)}})}
+function circleF(ll,r){const pts=[];for(let i=0;i<=64;i++){const a=i/64*2*Math.PI;pts.push([ll[0]+r/(111320*Math.cos(ll[1]*Math.PI/180))*Math.cos(a),ll[1]+r/110540*Math.sin(a)])}return{type:'Feature',geometry:{type:'Polygon',coordinates:[pts]},properties:{}}}
+async function fetchLamps(ll,r){
+  try{const w=`within_distance(geo_point_2d, geom'POINT(${ll[0]} ${ll[1]})', ${r}m)`;const res=await get(`${LAMPS_ODS}?where=${encodeURIComponent(w)}&limit=100`,{},9000);
+    if(res.ok){const j=await res.json();const out=(j.results||[]).map(x=>x.geo_point_2d).filter(g=>g&&isFinite(g.lon)&&isFinite(g.lat)).map(g=>[+g.lon,+g.lat]);if(out.length)return{pts:out,src:'Ville de Toulouse'}}}catch(e){}
+  try{const q=`[out:json][timeout:15];node["highway"="street_lamp"](around:${r},${ll[1]},${ll[0]});out;`;const res=await get(SRC.overpass,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}},15000);
+    if(res.ok){const j=await res.json();const out=(j.elements||[]).filter(e=>isFinite(e.lat)).map(e=>[e.lon,e.lat]);if(out.length)return{pts:out,src:'OpenStreetMap'}}}catch(e){}
+  return{pts:[],src:''}}
+function lightsOff(msg){LIGHT=null;clearTimeout(lightT);if(M){M.getSource('ae-zone').setData(fc([]));M.getSource('ae-lamps').setData(fc([]))}render();if(msg)toast(msg)}
+async function lightsOn(btn){
+  if(btn){btn.classList.add('lit');btn.setAttribute('aria-pressed','true')}
+  let ll=await getPos();if(ll&&inArea(ll))myLL=ll;else{ll=T.alert?T.alert.ll:GEO.center;toast('Position non disponible : démonstration au centre de Toulouse')}
+  const R=200,L=await fetchLamps(ll,R);
+  LIGHT={ll,until:Date.now()+15*60e3,n:L.pts.length,src:L.src};clearTimeout(lightT);lightT=setTimeout(()=>lightsOff('L\'éclairage renforcé est terminé'),15*60e3);
+  if(M){M.getSource('ae-zone').setData(fc([circleF(ll,R)]));M.getSource('ae-lamps').setData(fc(L.pts.map(p=>pt(p,{}))));M.flyTo({center:ll,zoom:16.6})}
+  render();toast(L.pts.length?`Éclairage renforcé demandé pour ${L.pts.length} lampadaire${L.pts.length>1?'s':''} à moins de 200 m (15 min)`:'Éclairage renforcé demandé dans un rayon de 200 m (15 min)');
 }
 let sugT=null;
 app.addEventListener('input',e=>{const t=e.target;if(t.id!=='from'&&t.id!=='to')return;T.form[t.id]=t.value;delete T.pickd[t.id];clearTimeout(sugT);
@@ -589,7 +668,7 @@ function mapAct(a,el){
   if(a==='sug'){const s=T.sugs[el.dataset.f][+el.dataset.i];T.pickd[el.dataset.f]=s;T.form[el.dataset.f]=s.n;render();return true}
   if(a==='locate'){if(!navigator.geolocation){toast('Géolocalisation non disponible');return true}
     navigator.geolocation.getCurrentPosition(p=>{const ll=[p.coords.longitude,p.coords.latitude];if(!inArea(ll)){toast('Vous êtes hors de Toulouse : la démo est centrée sur Toulouse');return}
-      T.pickd.from={n:'Ma position',ll};T.form.from='Ma position';render();M&&M.flyTo({center:ll,zoom:15.5})},()=>toast('Position refusée ou indisponible'),{enableHighAccuracy:true,timeout:8000});return true}
+      myLL=ll;T.pickd.from={n:'Ma position',ll};T.form.from='Ma position';render();M&&M.flyTo({center:ll,zoom:15.5})},()=>toast('Position refusée ou indisponible'),{enableHighAccuracy:true,timeout:8000});return true}
   if(a==='calc'){(async()=>{try{const A=await ensurePick('from'),B=await ensurePick('to');if(!A||!B){toast('Adresse introuvable à Toulouse');return}
       toast('Calcul de l\'itinéraire…');const r=await get(`${SRC.route}${A.ll[0]},${A.ll[1]};${B.ll[0]},${B.ll[1]}?overview=full&geometries=geojson`,{},15000);const j=await r.json();if(j.code!=='Ok'||!j.routes?.[0])throw 0;
       const rt=j.routes[0],cs=rt.geometry.coordinates,all=MD.all||allPlaces();
@@ -597,7 +676,14 @@ function mapAct(a,el){
       T.plan={a:A,b:B,geo:rt.geometry,dist:rt.distance,dur:rt.duration,safe};render();
       const bd=cs.reduce((b,c)=>[[Math.min(b[0][0],c[0]),Math.min(b[0][1],c[1])],[Math.max(b[1][0],c[0]),Math.max(b[1][1],c[1])]],[cs[0],cs[0]]);M&&M.fitBounds(bd,{padding:50,maxZoom:16})}
     catch(err){toast('Itinéraire indisponible pour le moment')}})();return true}
-  if(a==='trip2'&&T.plan){T.trip=T.plan;T.plan=null;render();toast('Trajet partagé avec vos proches');return true}
+  if(a==='trip2'&&T.plan){T.trip=T.plan;T.plan=null;T.sheet='peek';render();toast('Trajet partagé avec vos proches');return true}
+  if(a==='layers'){T.layers=!T.layers;render();return true}
+  if(a==='sheetplan'){T.sheet='plan';T.layers=false;render();const f=document.getElementById(T.pickd.from?'to':'from');if(f)f.focus();return true}
+  if(a==='sheetpeek'){T.sheet='peek';T.selPlace=null;render();return true}
+  if(a==='toplace'){const q=T.selPlace;if(!q)return true;T.pickd.to={n:q.n,ll:q.ll};T.form.to=q.n;T.plan=null;T.sheet='plan';
+    if(myLL&&inArea(myLL)){T.pickd.from={n:'Ma position',ll:myLL};T.form.from='Ma position';render();mapAct('calc')}else render();return true}
+  if(a==='lights'){if(LIGHT&&LIGHT.until>Date.now())lightsOff('Éclairage renforcé désactivé');else lightsOn(el);return true}
+  if(a==='locme'){getPos().then(ll=>{if(!ll){toast('Position refusée ou indisponible');return}if(!inArea(ll)){toast('Vous êtes hors de Toulouse : la démo est centrée sur Toulouse');return}myLL=ll;render();M&&M.flyTo({center:ll,zoom:16})});return true}
   return false;
 }
 
@@ -657,7 +743,7 @@ async function startRec(){const a=T.alert;if(!a)return;
     mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
     mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mr.mimeType||type||'audio/webm'});
       if(blob.size)idbPut('audio',{id:'r'+a.t0,t0:a.t0,dur:Math.round((Date.now()-a.t0)/1000),type:blob.type,blob}).then(()=>{toast('Enregistrement audio sauvegardé');if(S.tab==='me')fillRecs();fillLastRec()},()=>toast('Enregistrement impossible à sauvegarder'))};
-    mr.start(5000);REC=mr;a.rec={state:'on'};render();
+    mr.start(5000);REC=mr;a.rec={state:'on'};if(!S.micOk){S.micOk=true;save()}render();
   }catch(e){a.rec={state:'off',why:'Micro refusé : l\'alerte continue sans audio'};render()}}
 function stopRec(){if(REC&&REC.state!=='inactive')try{REC.stop()}catch(e){}REC=null}
 const fmtDur=d=>`${Math.floor(d/60)} min ${String(d%60).padStart(2,'0')} s`;
@@ -727,7 +813,42 @@ function liveAct(a,el){
     if(myLL&&inArea(myLL)){T.pickd.from={n:'Ma position',ll:myLL};T.form.from='Ma position'}T.plan=null;S.tab='map';render();window.scrollTo(0,0);if(T.pickd.from)mapAct('calc');return true}
   return false}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dpin'){e.preventDefault();const b=document.querySelector('[data-act=dodel]');b&&b.click()}if(e.key==='Escape'&&T.delId){const b=document.querySelector('[data-act=nodel]');b&&b.click()}});
+/* ---------- objet connecté ---------- */
+function modalWrap(inner){return `<div class="modal" role="dialog" aria-modal="true"><div class="card">${inner}<button class="btn ghost" style="margin-top:10px" data-act="closemodal">Fermer</button></div></div>`}
+function deviceBody(inModal){const dn={watch:['Montre connectée','Apple Watch, Wear OS, Garmin…'],band:['Bracelet AelySafe','Appui long pour alerter'],key:['Porte-clés AelySafe','À accrocher à son sac']};
+  return `<${inModal?'h2':'h3'}>Mon objet connecté</${inModal?'h2':'h3'}>
+  <p class="mute">Il déclenche l'alerte d'un geste, sans sortir votre téléphone.</p>
+  ${Object.entries(dn).map(([v,[t,d]])=>`<label class="opt ${S.device===v?'on':''}"><input type="radio" name="dev2" value="${v}" ${S.device===v?'checked':''}><span class="g"><b>${t}</b><br><small>${d}</small></span>${S.device===v&&S.paired?'<span class="pill ok"><span class="dot"></span>Appairé</span>':''}</label>`).join('')}
+  ${S.paired?`<div class="row" style="margin-top:8px"><button class="btn ghost g" data-act="unpair">Dissocier</button><button class="btn g" data-act="press">Tester l'appui</button></div><p class="mute" style="margin-top:6px">« Tester l'appui » lance une vraie alerte, comme si vous appuyiez sur l'objet.</p>`
+   :`<button class="btn" style="margin-top:8px" data-act="pair" ${S.device?'':'disabled'}>Appairer ${S.device?'cet objet':''}</button>`}
+  <p class="note">V0 : l'appairage Bluetooth est simulé.</p>`}
+
+/* ---------- autorisations : micro + notifications, demandées dès le lancement ---------- */
+async function permState(){let mic='prompt';try{mic=(await navigator.permissions.query({name:'microphone'})).state}catch(e){mic=S.micOk?'granted':'prompt'}
+  return{mic,notif:canNotif()?Notification.permission:'unsupported'}}
+function requestMic(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return Promise.resolve(false);
+  return navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{st.getTracks().forEach(t=>t.stop());S.micOk=true;save();return true},()=>{S.micOk=false;save();return false})}
+function permsModal(){const p=T.perm||{},st=v=>v==='granted'?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':v==='denied'?'<span class="pill" style="background:var(--soft)">Bloqué</span>':'';
+  return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="pmt"><div class="card"><h2 id="pmt">Deux autorisations pour vous protéger</h2>
+  <p class="mute">AelySafe ne les utilise que pendant une alerte ou pour l'entraide.</p>
+  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('mic')}</div><div class="g"><b>Micro</b><br><small>Enregistrer le son pendant une alerte, comme preuve.</small></div>${st(p.mic)}</div>
+  <div class="perm"><div class="ic" style="background:var(--pk)">${ico('bell')}</div><div class="g"><b>Notifications</b><br><small>Savoir qu'un aidant arrive, ou qu'on a besoin de vous.</small></div>${st(p.notif)}</div>
+  ${p.mic==='denied'||p.notif==='denied'?'<p class="note">Une autorisation bloquée se réactive dans les réglages du navigateur (icône à gauche de l\'adresse du site).</p>':''}
+  <div class="row" style="margin-top:12px"><button class="btn g" data-act="allowall">Tout autoriser</button><button class="btn ghost g" data-act="permlater">Plus tard</button></div></div></div>`}
+function micCard(){return `<div class="card"><h3>Micro</h3><p class="mute">Pour enregistrer automatiquement le son pendant une alerte.</p>${S.micOk?'<span class="pill ok"><span class="dot"></span>Autorisé</span>':'<button class="btn lv" data-act="allowmic">Autoriser le micro</button>'}</div>`}
+async function checkPerms(){if(!S.onb||T.alert||T.permLater)return;const p=await permState();T.perm=p;if(p.mic==='granted'&&!S.micOk){S.micOk=true;save()}
+  if((p.mic==='prompt'||p.notif==='default')&&!T.modalKind&&!T.modal){T.modalKind='perms';render()}}
+function permAct(a,el){
+  if(a==='allowall'){el.disabled=true;el.textContent='Autorisation en cours…';
+    const n=canNotif()&&Notification.permission==='default'?Notification.requestPermission().catch(()=>{}):Promise.resolve();
+    n.then(()=>requestMic()).then(async ok=>{T.perm=await permState();T.modalKind=null;render();
+      toast(ok&&(!canNotif()||Notification.permission==='granted')?'Micro et notifications autorisés':ok?'Micro autorisé':'Micro refusé : vous pourrez l\'autoriser dans Compte')});return true}
+  if(a==='allowmic'){requestMic().then(ok=>{render();toast(ok?'Micro autorisé':'Micro refusé ou bloqué par le navigateur')});return true}
+  if(a==='permlater'){T.permLater=true;T.modalKind=null;render();return true}
+  return false}
+
 helperNet();
+setTimeout(checkPerms,600);
 if(S.onb)initMap().then(()=>{if(T.alert||S.tab==='map')render()});
 render();
 }
